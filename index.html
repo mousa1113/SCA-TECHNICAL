@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCA Technical Inspection</title>
+    <style>
+        :root { --navy: #0d2546; --gold: #c5a059; --bg: #f4f7f9; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: var(--bg); }
+
+        .official-header {
+            display: grid; grid-template-columns: 200px 1fr 200px;
+            border: 2px solid #000; background: #fff;
+            width: 1000px; margin: 20px auto; min-height: 120px;
+        }
+        .h-logo { display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .h-logo img { max-width: 100%; max-height: 100px; }
+        .h-center { display: flex; flex-direction: column; text-align: center; justify-content: center; border-left: 2px solid #000; border-right: 2px solid #000; }
+        .h-line-1 { font-size: 1.4rem; font-weight: bold; color: var(--navy); border-bottom: 2px solid #000; padding: 5px; }
+        .h-line-3 { font-size: 1.6rem; font-weight: 900; background: #eee; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+
+        .container { width: 1000px; margin: 0 auto; padding-bottom: 50px; }
+        .screen { display: none; background: #fff; padding: 35px; border: 1px solid #ddd; border-radius: 12px; }
+        .active { display: block; }
+
+        .vsp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .vsp-card { background: #fff; padding: 30px; text-align: center; border: 2px solid #eee; font-size: 1.3rem; font-weight: bold; cursor: pointer; border-radius: 10px; }
+        .vsp-card.selected { background: var(--navy) !important; color: var(--gold) !important; }
+
+        .region-card { border: 2px solid #000; margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: #fff; }
+        .region-main { display: flex; height: 70px; align-items: center; }
+        .region-name { flex-grow: 1; border: none; background: transparent; font-size: 1.4rem; font-weight: bold; cursor: pointer; text-align: center; border-right: 2px solid #000; height: 100%; color: var(--navy); }
+        .region-count-box { width: 110px; height: 100%; background: var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .region-count-input { width: 100%; height: 100%; border: none; background: transparent; font-size: 2.2rem; font-weight: 900; text-align: center; color: #000; outline: none; }
+
+        .sub-fields { display: none; background: #fdfdfd; padding: 20px; border-top: 2px solid #000; }
+        .sub-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .sub-row input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; }
+
+        /* تعديلات الجدول اللي طلبتها */
+        .parts-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
+        .parts-table th, .parts-table td { border: 2px solid #000 !important; padding: 5px; text-align: center; }
+        .parts-table th { background: #eee; font-weight: bold; }
+        
+        .col-no { width: 50px; }
+        .col-name { width: 600px; } /* تكبير اسم القطعة */
+        .col-qty { width: 80px; }   /* تصغير الكمية */
+        .col-pno { width: 150px; }  /* تصغير رقم القطعة */
+
+        .parts-table input { width: 100%; height: 40px; border: none; text-align: center; font-size: 1rem; font-weight: bold; outline: none; background: transparent; }
+
+        .btn { padding: 12px 25px; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        .btn-edit { background: #f0f0f0; color: #333; border: 1px solid #ccc; }
+        .is-editing .btn-edit { background: #27ae60; color: white; }
+        .btn-nav { background: var(--navy); color: white; }
+
+        @media print { .no-print { display: none !important; } #scr3 { display: block !important; border:none; } .container { width: 100% !important; margin:0; } }
+    </style>
+</head>
+<body>
+
+    <header class="official-header">
+        <div class="h-logo"><img src="image_5c761b.png"></div>
+        <div class="h-center">
+            <div class="h-line-1">SUEZ CANAL AUTHORITY</div>
+            <div class="h-line-3">TECHNICAL INSPECTION REPORT</div>
+        </div>
+        <div class="h-logo"><img src="image_5c0103.png"></div>
+    </header>
+
+    <div class="container">
+        <main id="scr1" class="screen active">
+            <h2 style="text-align:center;">Select Unit</h2>
+            <div class="vsp-grid" id="vspGrid"></div>
+        </main>
+
+        <main id="scr2" class="screen">
+            <div class="no-print" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button class="btn btn-edit" id="btnEdit2" onclick="toggleEdit(2)">✎ EDIT MODE</button>
+                <h2 id="vspLabel">Unit</h2>
+                <button class="btn btn-nav" onclick="nav(1)">BACK</button>
+            </div>
+            <div id="regionsContainer"></div>
+        </main>
+
+        <main id="scr3" class="screen">
+            <div class="no-print" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <button class="btn btn-edit" id="btnEdit3" onclick="toggleEdit(3)">✎ EDIT REPORT</button>
+                <h2 id="partLabel">Spare Part</h2>
+                <button class="btn btn-nav" onclick="nav(2)">BACK</button>
+            </div>
+            <table class="parts-table" id="reportTable">
+                <thead>
+                    <tr>
+                        <th class="col-no">No.</th>
+                        <th class="col-name">Part Name</th>
+                        <th class="col-qty">Qty.</th>
+                        <th class="col-pno">Part No.</th>
+                    </tr>
+                </thead>
+                <tbody id="partsTableBody"></tbody>
+            </table>
+            <textarea id="noteVal" style="width:100%; height:120px; margin-top:15px; border:2px solid #000;" placeholder="Notes..."></textarea>
+            <button class="btn no-print" style="width:100%; margin-top:20px; background:#000; color:#fff;" onclick="window.print()">PRINT PDF</button>
+        </main>
+    </div>
+
+    <script>
+        let db = JSON.parse(localStorage.getItem('sca_final_v101')) || { units:['VSP 10','VSP 12','VSP 14','VSP 16','VSP 24','VSP 28','VSP 32'], storage:{}, last:null };
+        let curU='', curRIdx=-1, isEdit=false;
+
+        function init() { 
+            document.getElementById('vspGrid').innerHTML = db.units.map(u => `<div class="vsp-card ${u===db.last?'selected':''}" onclick="nav(2,'${u}')">${u}</div>`).join(''); 
+        }
+
+        function nav(s, v) {
+            document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+            document.getElementById('scr'+s).classList.add('active');
+            if(s===2 && v) { curU=v; db.last=v; save(); renderReg(); }
+            if(s===3) { if(typeof v === 'number') curRIdx=v; renderParts(); }
+            isEdit = false; updateUI(s);
+        }
+
+        function renderReg() {
+            const c = document.getElementById('regionsContainer');
+            if(!db.storage[curU]) db.storage[curU] = [{name:'Main Area', code:1, subs:[''], parts:[], note:''}];
+            c.innerHTML = db.storage[curU].map((r, i) => `
+                <div class="region-card">
+                    <div class="region-main">
+                        ${isEdit?`<button style="background:red; color:white; border:none; width:50px; height:100%; cursor:pointer;" onclick="remR(${i})">X</button>`:''}
+                        <button class="region-name" onclick="goRep(${i})">
+                            ${isEdit?`<input type="text" value="${r.name}" style="width:90%; font-weight:bold; text-align:center; border:none; color:var(--navy); font-size:1.4rem;" onchange="upN(${i},this.value)" onclick="event.stopPropagation()">`:r.name}
+                        </button>
+                        <div class="region-count-box" onclick="toggleSubView(event, ${i})">
+                            <input type="number" class="region-count-input" value="${r.code}" ${isEdit ? '' : 'readonly'} onchange="autoSubs(${i}, this.value)" onclick="event.stopPropagation()" style="pointer-events: ${isEdit ? 'auto' : 'none'};">
+                        </div>
+                    </div>
+                    <div id="sub-box-${i}" class="sub-fields">
+                        ${(r.subs || []).map((s, si) => `<div class="sub-row"><span>${si+1}.</span><input type="text" value="${s}" ${isEdit?'':'disabled'} onchange="upSub(${i},${si},this.value)"></div>`).join('')}
+                    </div>
+                </div>
+            `).join('') + (isEdit?`<button class="btn" style="width:100%; background:#27ae60; color:white; margin-top:10px;" onclick="addR()">+ Add New Work Area</button>`:'');
+            document.getElementById('vspLabel').innerText = "Vessel: " + curU;
+        }
+
+        // الوظيفة المسؤولة عن فتح الخانات بالضغط على المربع الذهبي
+        function toggleSubView(e, i) {
+            if(!isEdit) {
+                let el = document.getElementById('sub-box-'+i);
+                el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+            }
+        }
+
+        function autoSubs(idx, val) {
+            let num = Math.max(0, parseInt(val) || 0);
+            let currentSubs = db.storage[curU][idx].subs || [];
+            while(currentSubs.length < num) currentSubs.push('');
+            db.storage[curU][idx].subs = currentSubs.slice(0, num);
+            db.storage[curU][idx].code = num;
+            save(); renderReg(); 
+            document.getElementById('sub-box-'+idx).style.display = 'block'; 
+        }
+
+        function renderParts() {
+            const r = db.storage[curU][curRIdx];
+            const b = document.getElementById('partsTableBody'); b.innerHTML = '';
+            for(let i=0; i<30; i++) {
+                const p = (r.parts && r.parts[i]) ? r.parts[i] : {n:'', q:'', pn:''};
+                b.innerHTML += `<tr><td>${i+1}</td>
+                <td><input type="text" value="${p.n||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'n',this.value)" style="text-align:left; padding-left:10px;"></td>
+                <td><input type="text" value="${p.q||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'q',this.value)"></td>
+                <td><input type="text" value="${p.pn||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'pn',this.value)"></td></tr>`;
+            }
+            document.getElementById('noteVal').value = r.note || '';
+            document.getElementById('partLabel').innerText = r.name;
+        }
+
+        function toggleEdit(s) { isEdit = !isEdit; updateUI(s); if(!isEdit) save(); }
+        function updateUI(s) {
+            const btn = document.getElementById('btnEdit'+s); if(btn) btn.innerText = isEdit?"✔ SAVE DATA":"✎ EDIT MODE";
+            if(s===2) renderReg(); if(s===3) { renderParts(); document.getElementById('noteVal').disabled=!isEdit; }
+        }
+
+        function save() { localStorage.setItem('sca_final_v101', JSON.stringify(db)); }
+        function goRep(i) { if(!isEdit) { curRIdx=i; nav(3); } }
+        function upN(i,v) { db.storage[curU][i].name=v; save(); }
+        function upSub(i,si,v) { db.storage[curU][i].subs[si]=v; save(); }
+        function upP(i,k,v) { 
+            if(!db.storage[curU][curRIdx].parts) db.storage[curU][curRIdx].parts = [];
+            if(!db.storage[curU][curRIdx].parts[i]) db.storage[curU][curRIdx].parts[i]={n:'',q:'',pn:''}; 
+            db.storage[curU][curRIdx].parts[i][k]=v; save(); 
+        }
+        function addR() { db.storage[curU].push({name:'New Area', code:1, subs:[''], parts:[], note:''}); renderReg(); }
+        function remR(i) { if(confirm("Delete Area?")) { db.storage[curU].splice(i,1); renderReg(); save(); } }
+        document.getElementById('noteVal').onchange = (e) => { db.storage[curU][curRIdx].note = e.target.value; save(); };
+
+        init();
+    </script>
+</body>
+</html>
