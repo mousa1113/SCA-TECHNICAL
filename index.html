@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCA Technical Inspection - Pro</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Tajawal:wght@400;700&family=Almarai:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root { --navy: #0d2546; --gold: #c5a059; --bg: #f4f7f9; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: var(--bg); }
 
+        /* الهيدر */
         .official-header {
             display: grid; grid-template-columns: 200px 1fr 200px;
             border: 2px solid #000; background: #fff;
@@ -26,8 +26,10 @@
         .screen { display: none; background: #fff; padding: 35px; border: 1px solid #ddd; border-radius: 12px; }
         .active { display: block; }
 
+        /* الكروت */
         .vsp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .vsp-card { background: #fff; padding: 30px; text-align: center; border: 2px solid #eee; font-size: 1.3rem; font-weight: bold; cursor: pointer; border-radius: 10px; }
+        .vsp-card { background: #fff; padding: 30px; text-align: center; border: 2px solid #eee; font-size: 1.3rem; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.3s; }
+        .vsp-card:hover { border-color: var(--gold); }
         .vsp-card.selected { background: var(--navy) !important; color: var(--gold) !important; }
 
         .region-card { border: 2px solid #000; margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: #fff; }
@@ -41,43 +43,40 @@
         .sub-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
         .sub-row input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; }
 
+        /* الجدول */
         .parts-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
         .parts-table th, .parts-table td { border: 2px solid #000 !important; padding: 5px; text-align: center; }
         .parts-table th { background: #eee; font-weight: bold; }
-        
-        .col-no { width: 45px; }
-        .col-name { width: 580px; } 
-        .col-qty { width: 70px; }  
-        .col-pno { width: 150px; } 
-
         .parts-table input { width: 100%; height: 35px; border: none; text-align: center; font-size: 1rem; font-weight: bold; outline: none; background: transparent; }
-        .parts-table td:nth-child(2) input { text-align: left; padding-left: 10px; }
+
+        /* أدوات التنسيق الجديدة */
+        .text-tools-bar { display: none; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; margin-right: 10px; }
+        .text-tools-bar select, .text-tools-bar input { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+
+        /* ستايل قائمة الملفات المرفقة */
+        .files-manager { margin-top: 15px; border: 2px solid #000; border-radius: 5px; overflow: hidden; }
+        .files-header { background: #333; color: white; padding: 10px; cursor: pointer; display: flex; justify-content: space-between; }
+        .files-list { display: none; background: #fff; padding: 10px; list-style: none; margin: 0; }
+        .file-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #eee; }
+        .file-item input { flex-grow: 1; padding: 4px; }
 
         .btn { padding: 12px 25px; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
         .btn-edit { background: #f0f0f0; color: #333; border: 1px solid #ccc; }
-        .is-editing .btn-edit { background: #27ae60; color: white; }
+        .is-editing .btn-edit { background: #27ae60 !important; color: white !important; }
         .btn-nav { background: var(--navy); color: white; }
 
-        .parts-control { display: flex; align-items: center; gap: 10px; }
-        .parts-num-box { background: var(--gold); width: 60px; height: 40px; display: flex; border: 2px solid #000; border-radius: 5px; }
-        .parts-num-box input { width: 100%; border: none; background: transparent; text-align: center; font-weight: 900; font-size: 1.2rem; }
-
-        /* تسيق أدوات التعديل الجديدة */
-        .text-tools-bar { display: none; align-items: center; gap: 8px; background: #fff; padding: 5px 15px; border: 1px solid #ccc; border-radius: 8px; margin-left: 10px; }
-        .file-input-wrapper { display: none; align-items: center; gap: 8px; border-left: 2px solid #ccc; padding-left: 10px; }
-
-        @media print { .no-print { display: none !important; } #scr3 { display: block !important; border:none; } .container { width: 100% !important; margin:0; } }
+        @media print { .no-print { display: none !important; } .screen { display: block !important; border:none; } .container { width: 100% !important; margin:0; } }
     </style>
 </head>
-<body>
+<body class="">
 
     <header class="official-header">
-        <div class="h-logo"><img src="image_5c761b.png"></div>
+        <div class="h-logo"><img src="image_5c761b.png" alt="Logo"></div>
         <div class="h-center">
             <div class="h-line-1">SUEZ CANAL AUTHORITY</div>
             <div class="h-line-3">TECHNICAL INSPECTION REPORT</div>
         </div>
-        <div class="h-logo"><img src="image_5c0103.png"></div>
+        <div class="h-logo"><img src="image_5c0103.png" alt="Logo"></div>
     </header>
 
     <div class="container">
@@ -91,9 +90,15 @@
                 <div style="display:flex; align-items: center;">
                     <button class="btn btn-edit" id="btnEdit2" onclick="toggleEdit(2)">✎ EDIT MODE</button>
                     <div id="tools2" class="text-tools-bar">
-                        <select id="font2" onchange="applyStyle(2)"><option value="'Segoe UI'">Segoe UI</option><option value="Arial">Arial</option><option value="Tahoma">Tahoma</option></select>
-                        <input type="number" id="size2" value="22" style="width:50px" onchange="applyStyle(2)">
-                        <input type="color" id="color2" onchange="applyStyle(2)">
+                        <select id="font2" onchange="applyStyle(2)">
+                            <option value="'Segoe UI'">Default</option>
+                            <option value="'Cairo'">Cairo (Arabic)</option>
+                            <option value="'Tajawal'">Tajawal</option>
+                            <option value="'Almarai'">Almarai</option>
+                            <option value="'Roboto'">Roboto</option>
+                        </select>
+                        <input type="number" id="size2" value="22" style="width:55px" onchange="applyStyle(2)">
+                        <input type="color" id="color2" value="#0d2546" onchange="applyStyle(2)">
                     </div>
                 </div>
                 <h2 id="vspLabel">Unit</h2>
@@ -107,43 +112,71 @@
                 <div style="display:flex; align-items: center;">
                     <button class="btn btn-edit" id="btnEdit3" onclick="toggleEdit(3)">✎ EDIT REPORT</button>
                     <div id="tools3" class="text-tools-bar">
-                        <select id="font3" onchange="applyStyle(3)"><option value="'Segoe UI'">Segoe UI</option><option value="Arial">Arial</option><option value="Courier New">Courier New</option></select>
-                        <input type="number" id="size3" value="16" style="width:50px" onchange="applyStyle(3)">
-                        <input type="color" id="color3" onchange="applyStyle(3)">
-                        <div class="file-input-wrapper" id="fileWrapper3">
-                            <label for="fileIn" style="cursor:pointer; background:#eee; padding:5px; border:1px solid #999; font-size:12px;">📎 Attach File</label>
-                            <input type="file" id="fileIn" hidden onchange="handleFile(this)">
-                            <span id="fileName" style="font-size:10px; max-width:80px; overflow:hidden;"></span>
+                        <select id="font3" onchange="applyStyle(3)">
+                            <option value="'Segoe UI'">Default</option>
+                            <option value="'Cairo'">Cairo</option>
+                            <option value="'Tajawal'">Tajawal</option>
+                            <option value="'Roboto'">Roboto</option>
+                        </select>
+                        <input type="number" id="size3" value="16" style="width:55px" onchange="applyStyle(3)">
+                        <input type="color" id="color3" value="#000000" onchange="applyStyle(3)">
+                        
+                        <div id="fileWrapper3" style="display:none; border-left:1px solid #ccc; padding-left:10px;">
+                            <label for="fileIn" style="cursor:pointer; background:var(--gold); color:white; padding:5px 10px; border-radius:4px; font-size:12px;">📎 Attach</label>
+                            <input type="file" id="fileIn" hidden multiple onchange="handleFileUpload(this)">
                         </div>
                     </div>
                 </div>
-                <div class="parts-control">
+                <div style="display:flex; align-items:center; gap:10px;">
                     <h2 id="partLabel" style="margin:0;">Spare Part</h2>
-                    <div class="parts-num-box"><input type="number" id="rowsLimit" value="30" onchange="updateRowsLimit(this.value)"></div>
+                    <input type="number" id="rowsLimit" value="30" onchange="updateRowsLimit(this.value)" style="width:50px; text-align:center; font-weight:bold; border:2px solid var(--gold); border-radius:4px;">
                 </div>
                 <button class="btn btn-nav" onclick="nav(2)">BACK</button>
             </div>
+
             <table class="parts-table" id="reportTable">
                 <thead>
-                    <tr><th class="col-no">No.</th><th class="col-name">Part Name</th><th class="col-qty">Qty.</th><th class="col-pno">Part No.</th></tr>
+                    <tr><th style="width:50px;">No.</th><th>Part Name</th><th style="width:80px;">Qty.</th><th style="width:160px;">Part No.</th></tr>
                 </thead>
                 <tbody id="partsTableBody"></tbody>
             </table>
+
+            <div class="files-manager" id="filesManager">
+                <div class="files-header" onclick="toggleFilesList()">
+                    <span>📁 Attached Files (<span id="fileCount">0</span>)</span>
+                    <span>▼</span>
+                </div>
+                <ul class="files-list" id="attachedFileList"></ul>
+            </div>
+
             <textarea id="noteVal" style="width:100%; height:100px; margin-top:15px; border:2px solid #000; padding:10px; font-weight:bold;" placeholder="Notes..."></textarea>
-            <button class="btn no-print" style="width:100%; margin-top:20px; background:#000; color:#fff;" onclick="window.print()">PRINT PDF</button>
+            
+            <button class="btn no-print" style="width:100%; margin-top:20px; background:#000; color:#fff;" onclick="window.print()">PRINT TO PDF</button>
         </main>
     </div>
 
     <script>
-        // --- لإعداد المزامنة: استبدل config ببيانات مشروع Firebase الخاص بك ---
-        const firebaseConfig = { apiKey: "AIza...", databaseURL: "https://your-db.firebaseio.com", projectId: "your-id" };
-        // firebase.initializeApp(firebaseConfig);
-        // const rtdb = firebase.database();
+        // --- ميزة المزامنة بين الأجهزة (قناة اتصال محلية) ---
+        const syncChannel = new BroadcastChannel('sca_sync');
+        syncChannel.onmessage = (event) => {
+            db = event.data;
+            refreshCurrentScreen();
+        };
 
-        let db = JSON.parse(localStorage.getItem('sca_final_v101')) || { units:['VSP 10','VSP 12','VSP 14','VSP 16','VSP 24','VSP 28','VSP 32'], storage:{}, last:null };
+        // الداتا الأساسية
+        let db = JSON.parse(localStorage.getItem('sca_v102')) || { 
+            units:['VSP 10','VSP 12','VSP 14','VSP 16','VSP 24','VSP 28','VSP 32'], 
+            storage:{}, 
+            last:null 
+        };
+        
         let curU='', curRIdx=-1, isEdit=false;
 
-        function init() { document.getElementById('vspGrid').innerHTML = db.units.map(u => `<div class="vsp-card ${u===db.last?'selected':''}" onclick="nav(2,'${u}')">${u}</div>`).join(''); }
+        function init() { 
+            document.getElementById('vspGrid').innerHTML = db.units.map(u => 
+                `<div class="vsp-card ${u===db.last?'selected':''}" onclick="nav(2,'${u}')">${u}</div>`
+            ).join(''); 
+        }
 
         function nav(s, v) {
             document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
@@ -155,46 +188,94 @@
 
         function renderReg() {
             const c = document.getElementById('regionsContainer');
-            if(!db.storage[curU]) db.storage[curU] = [{name:'Main Area', code:1, subs:[''], parts:[], note:'', rowsLimit: 30, style:{}}];
+            if(!db.storage[curU]) db.storage[curU] = [{name:'Main Engine', code:1, subs:[''], parts:[], note:'', rowsLimit: 30, style:{}, files:[]}];
+            
             c.innerHTML = db.storage[curU].map((r, i) => `
                 <div class="region-card">
                     <div class="region-main">
-                        ${isEdit?`<button style="background:red; color:white; border:none; width:50px; height:100%; cursor:pointer;" onclick="remR(${i})">X</button>`:''}
-                        <button class="region-name" id="regBtn_${i}" onclick="goRep(${i})" style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1.4rem'}; color:${r.style?.color || 'var(--navy)'};">
+                        ${isEdit?`<button style="background:#e74c3c; color:white; border:none; width:50px; height:100%; cursor:pointer;" onclick="remR(${i})">X</button>`:''}
+                        <button class="region-name" onclick="goRep(${i})" style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1.4rem'}; color:${r.style?.color || 'var(--navy)'};">
                             ${isEdit?`<input type="text" value="${r.name}" style="width:90%; font-weight:bold; text-align:center; border:none; color:inherit; font-size:inherit; font-family:inherit;" onchange="upN(${i},this.value)" onclick="event.stopPropagation()">`:r.name}
                         </button>
                         <div class="region-count-box" onclick="handleGoldClick(${i})">
-                            <input type="number" class="region-count-input" value="${r.code}" ${isEdit ? '' : 'readonly'} onchange="autoSubs(${i}, this.value)" onclick="event.stopPropagation()" style="pointer-events: ${isEdit ? 'auto' : 'none'};">
+                            <input type="number" class="region-count-input" value="${r.code}" ${isEdit ? '' : 'readonly'} onchange="autoSubs(${i}, this.value)" onclick="event.stopPropagation()">
                         </div>
                     </div>
                     <div id="sub-box-${i}" class="sub-fields">
-                        ${(r.subs || []).map((s, si) => `<div class="sub-row"><span>${si+1}.</span><input type="text" value="${s}" ${isEdit?'':'disabled'} onchange="upSub(${i},${si},this.value)" style="font-family:${r.style?.font || 'inherit'}; color:${r.style?.color || '#000'};"></div>`).join('')}
+                        ${(r.subs || []).map((s, si) => `<div class="sub-row"><span>${si+1}.</span><input type="text" value="${s}" ${isEdit?'':'disabled'} onchange="upSub(${i},${si},this.value)" style="font-family:${r.style?.font || 'inherit'};"></div>`).join('')}
                     </div>
                 </div>
-            `).join('') + (isEdit?`<button class="btn" style="width:100%; background:#27ae60; color:white; margin-top:10px;" onclick="addR()">+ Add New Work Area</button>`:'');
+            `).join('') + (isEdit?`<button class="btn" style="width:100%; background:#27ae60; color:white; margin-top:10px;" onclick="addR()">+ Add New Area</button>`:'');
             document.getElementById('vspLabel').innerText = "Vessel: " + curU;
         }
 
         function renderParts() {
             const r = db.storage[curU][curRIdx];
             const limit = r.rowsLimit || 30;
-            const style = r.style3 || {};
-            document.getElementById('rowsLimit').value = limit;
-            const b = document.getElementById('partsTableBody'); b.innerHTML = '';
+            const style = r.style3 || {font: "'Segoe UI'", size: 16, color: "#000000"};
             
+            // تحديث واجهة الأدوات
+            document.getElementById('rowsLimit').value = limit;
+            document.getElementById('font3').value = style.font;
+            document.getElementById('size3').value = style.size;
+            document.getElementById('color3').value = style.color;
+
+            const b = document.getElementById('partsTableBody'); b.innerHTML = '';
             for(let i=0; i < limit; i++) {
                 const p = (r.parts && r.parts[i]) ? r.parts[i] : {n:'', q:'', pn:''};
-                b.innerHTML += `<tr><td>${i+1}</td>
-                <td><input type="text" value="${p.n||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'n',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td>
-                <td><input type="text" value="${p.q||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'q',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td>
-                <td><input type="text" value="${p.pn||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'pn',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td></tr>`;
+                b.innerHTML += `<tr>
+                    <td>${i+1}</td>
+                    <td><input type="text" value="${p.n||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'n',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color}; text-align:left; padding-left:10px;"></td>
+                    <td><input type="text" value="${p.q||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'q',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td>
+                    <td><input type="text" value="${p.pn||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'pn',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td>
+                </tr>`;
             }
+            
             const nv = document.getElementById('noteVal');
             nv.value = r.note || '';
             nv.style.fontFamily = style.font; nv.style.fontSize = style.size + 'px'; nv.style.color = style.color;
             document.getElementById('partLabel').innerText = r.name;
-            if(r.fileName) document.getElementById('fileName').innerText = r.fileName;
+            
+            renderFiles();
         }
+
+        // دالة رفع الملفات
+        function handleFileUpload(input) {
+            const r = db.storage[curU][curRIdx];
+            if(!r.files) r.files = [];
+            
+            Array.from(input.files).forEach(f => {
+                r.files.push({ name: f.name, type: f.type, desc: 'New File' });
+            });
+            save();
+            renderFiles();
+        }
+
+        function renderFiles() {
+            const r = db.storage[curU][curRIdx];
+            const list = document.getElementById('attachedFileList');
+            const count = document.getElementById('fileCount');
+            
+            if(!r.files || r.files.length === 0) {
+                list.innerHTML = '<li style="color:#999; text-align:center;">No files attached</li>';
+                count.innerText = "0";
+                return;
+            }
+
+            count.innerText = r.files.length;
+            list.innerHTML = r.files.map((f, i) => `
+                <li class="file-item">
+                    <span>📄</span>
+                    <strong style="font-size:12px;">${f.name}</strong>
+                    <input type="text" value="${f.desc}" placeholder="File info..." ${isEdit?'':'disabled'} onchange="updateFileDesc(${i}, this.value)">
+                    ${isEdit ? `<button onclick="removeFile(${i})" style="background:none; border:none; color:red; cursor:pointer;">✕</button>` : ''}
+                </li>
+            `).join('');
+        }
+
+        function updateFileDesc(i, val) { db.storage[curU][curRIdx].files[i].desc = val; save(); }
+        function removeFile(i) { db.storage[curU][curRIdx].files.splice(i,1); save(); renderFiles(); }
+        function toggleFilesList() { const l = document.getElementById('attachedFileList'); l.style.display = (l.style.display==='block')?'none':'block'; }
 
         function applyStyle(screen) {
             const f = document.getElementById('font'+screen).value;
@@ -210,53 +291,60 @@
             save();
         }
 
-        function handleFile(input) {
-            if(input.files[0]) {
-                db.storage[curU][curRIdx].fileName = input.files[0].name;
-                document.getElementById('fileName').innerText = input.files[0].name;
-                save();
-            }
+        function toggleEdit(s) { 
+            isEdit = !isEdit; 
+            document.body.classList.toggle('is-editing', isEdit);
+            updateUI(s); 
+            if(!isEdit) save(); 
         }
-
-        function toggleEdit(s) { isEdit = !isEdit; updateUI(s); if(!isEdit) save(); }
         
         function updateUI(s) {
-            const btn = document.getElementById('btnEdit'+s); if(btn) btn.innerText = isEdit?"✔ SAVE DATA":"✎ EDIT MODE";
+            const btn = document.getElementById('btnEdit'+s); if(btn) btn.innerText = isEdit?"✔ SAVE & SYNC":"✎ EDIT MODE";
             const tools = document.getElementById('tools'+s); if(tools) tools.style.display = isEdit ? 'flex' : 'none';
             if(s===3) { 
                 renderParts(); 
                 document.getElementById('noteVal').disabled=!isEdit; 
                 document.getElementById('rowsLimit').disabled=!isEdit;
-                document.getElementById('fileWrapper3').style.display = isEdit ? 'flex' : 'none';
+                document.getElementById('fileWrapper3').style.display = isEdit ? 'block' : 'none';
             }
             if(s===2) renderReg();
         }
 
         function handleGoldClick(idx) { if(!isEdit) { let el = document.getElementById('sub-box-'+idx); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; } }
+        
         function autoSubs(idx, val) {
             let num = Math.max(0, parseInt(val) || 0);
-            let currentSubs = db.storage[curU][idx].subs || [];
-            while(currentSubs.length < num) currentSubs.push('');
-            db.storage[curU][idx].subs = currentSubs.slice(0, num);
-            db.storage[curU][idx].code = num;
+            let r = db.storage[curU][idx];
+            while(r.subs.length < num) r.subs.push('');
+            r.subs = r.subs.slice(0, num);
+            r.code = num;
             save(); renderReg(); document.getElementById('sub-box-'+idx).style.display = 'block'; 
         }
+
         function save() { 
-            localStorage.setItem('sca_final_v101', JSON.stringify(db));
-            // لربط الأجهزة: rtdb.ref('sca_data').set(db);
+            localStorage.setItem('sca_v102', JSON.stringify(db));
+            syncChannel.postMessage(db); // إرسال الداتا لكل الأجهزة المفتوحة
         }
+
+        function refreshCurrentScreen() {
+            const s2 = document.getElementById('scr2').classList.contains('active');
+            const s3 = document.getElementById('scr3').classList.contains('active');
+            if(s2) renderReg();
+            if(s3) renderParts();
+        }
+
         function updateRowsLimit(v) { db.storage[curU][curRIdx].rowsLimit = v; save(); renderParts(); }
         function goRep(i) { if(!isEdit) { curRIdx=i; nav(3); } }
         function upN(i,v) { db.storage[curU][i].name=v; save(); }
         function upSub(i,si,v) { db.storage[curU][i].subs[si]=v; save(); }
         function upP(i,k,v) { 
-            if(!db.storage[curU][curRIdx].parts) db.storage[curU][curRIdx].parts = [];
             if(!db.storage[curU][curRIdx].parts[i]) db.storage[curU][curRIdx].parts[i]={n:'',q:'',pn:''}; 
             db.storage[curU][curRIdx].parts[i][k]=v; save(); 
         }
-        function addR() { db.storage[curU].push({name:'New Area', code:1, subs:[''], parts:[], note:'', rowsLimit: 30, style:{}}); renderReg(); }
-        function remR(i) { if(confirm("Delete?")) { db.storage[curU].splice(i,1); renderReg(); save(); } }
-        document.getElementById('noteVal').onchange = (e) => { db.storage[curU][curRIdx].note = e.target.value; save(); };
+        function addR() { db.storage[curU].push({name:'New Area', code:1, subs:[''], parts:[], note:'', rowsLimit: 30, style:{}, files:[]}); renderReg(); }
+        function remR(i) { if(confirm("Delete Area?")) { db.storage[curU].splice(i,1); renderReg(); save(); } }
+        
+        document.getElementById('noteVal').oninput = (e) => { db.storage[curU][curRIdx].note = e.target.value; save(); };
 
         init();
     </script>
