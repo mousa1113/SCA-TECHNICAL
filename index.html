@@ -7,58 +7,123 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Tajawal:wght@400;700&family=Almarai:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --navy: #0d2546; --gold: #c5a059; --bg: #f4f7f9; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background: var(--bg); }
+        :root { 
+            --navy: #0d2546; 
+            --gold: #c5a059; 
+            /* خلفية بيضاء بشفافية بسيطة للعناصر */
+            --bg-panel: rgba(255, 255, 255, 0.9); 
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            margin: 0; 
+            /* --- تعديل الخلفية لتشمل الصورة --- */
+            background-image: url('image_5c761b.png'); /* هنا بنحط صورة المركب/الشعار كخلفية */
+            background-attachment: fixed; /* الصورة تفضل ثابتة والموقع بيتحرك فوقها */
+            background-size: cover; /* الصورة تغطي الشاشة كلها */
+            background-position: center; /* تمليط الصورة في المنتصف */
+            background-repeat: no-repeat;
+        }
+
+        /* إضافة طبقة تعتيم خفيفة فوق صورة الخلفية عشان الكلام يبان */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 37, 70, 0.05); /* تعتيم كحلي خفيف جداً */
+            z-index: -1;
+        }
 
         .official-header {
             display: grid; grid-template-columns: 200px 1fr 200px;
-            border: 2px solid #000; background: #fff;
+            border: 2px solid #000; 
+            background: rgba(255, 255, 255, 0.95); /* هيدر أبيض شبه شفاف */
             width: 1000px; margin: 20px auto; min-height: 120px;
+            border-radius: 8px; overflow: hidden;
         }
         .h-logo { display: flex; align-items: center; justify-content: center; padding: 10px; }
         .h-logo img { max-width: 100%; max-height: 100px; }
         .h-center { display: flex; flex-direction: column; text-align: center; justify-content: center; border-left: 2px solid #000; border-right: 2px solid #000; }
         .h-line-1 { font-size: 1.4rem; font-weight: bold; color: var(--navy); border-bottom: 2px solid #000; padding: 5px; }
-        .h-line-3 { font-size: 1.6rem; font-weight: 900; background: #eee; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .h-line-3 { font-size: 1.6rem; font-weight: 900; background: rgba(238, 238, 238, 0.8); flex-grow: 1; display: flex; align-items: center; justify-content: center; }
 
         .container { width: 1000px; margin: 0 auto; padding-bottom: 50px; }
-        .screen { display: none; background: #fff; padding: 35px; border: 1px solid #ddd; border-radius: 12px; }
+        
+        /* جعل الشاشات بيضاء شبه شفافة */
+        .screen { 
+            display: none; 
+            background: var(--bg-panel); 
+            padding: 35px; 
+            border: 1px solid rgba(0,0,0,0.1); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ظل خفيف لإبراز العناصر */
+            backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية وراء العنصر */
+        }
         .active { display: block; }
 
         .vsp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .vsp-card { background: #fff; padding: 30px; text-align: center; border: 2px solid #eee; font-size: 1.3rem; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.3s; }
+        
+        /* كروت الوحدات شبه شفافة */
+        .vsp-card { 
+            background: rgba(255, 255, 255, 0.7); 
+            padding: 30px; 
+            text-align: center; 
+            border: 2px solid rgba(0,0,0,0.05); 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border-radius: 10px; 
+            transition: 0.3s; 
+        }
+        .vsp-card:hover { border-color: var(--gold); background: rgba(255, 255, 255, 0.9); }
         .vsp-card.selected { background: var(--navy) !important; color: var(--gold) !important; }
 
-        .region-card { border: 2px solid #000; margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: #fff; }
+        .region-card { border: 2px solid #000; margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: rgba(255, 255, 255, 0.8); }
         .region-main { display: flex; height: 70px; align-items: center; }
         .region-name { flex-grow: 1; border: none; background: transparent; font-size: 1.4rem; font-weight: bold; cursor: pointer; text-align: center; border-right: 2px solid #000; height: 100%; color: var(--navy); }
         .region-count-box { width: 110px; height: 100%; background: var(--gold); display: flex; align-items: center; justify-content: center; }
         .region-count-input { width: 100%; height: 100%; border: none; background: transparent; font-size: 2.2rem; font-weight: 900; text-align: center; outline: none; }
         
-        .sub-fields { display: none; background: #fdfdfd; padding: 20px; border-top: 2px solid #000; }
+        .sub-fields { display: none; background: rgba(253, 253, 253, 0.7); padding: 20px; border-top: 2px solid #000; }
         .sub-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        .sub-row input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; }
+        .sub-row input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; background: rgba(255, 255, 255, 0.8); }
 
-        .parts-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
+        .parts-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; background: rgba(255, 255, 255, 0.8); }
         .parts-table th, .parts-table td { border: 2px solid #000 !important; padding: 5px; text-align: center; }
-        .parts-table th { background: #eee; font-weight: bold; }
+        .parts-table th { background: rgba(238, 238, 238, 0.9); font-weight: bold; }
         .parts-table input { width: 100%; height: 35px; border: none; text-align: center; font-size: 1rem; font-weight: bold; outline: none; background: transparent; }
 
-        .text-tools-bar { display: none; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; margin-right: 10px; }
+        .text-tools-bar { display: none; align-items: center; gap: 10px; background: rgba(248, 249, 250, 0.9); padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; margin-right: 10px; }
         .text-tools-bar select, .text-tools-bar input { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
 
-        .files-section { margin-top: 15px; border: 2px solid #000; border-radius: 5px; overflow: hidden; }
-        .files-header { background: #333; color: white; padding: 10px; cursor: pointer; display: flex; justify-content: space-between; }
-        .files-list { display: none; background: #fff; padding: 10px; list-style: none; margin: 0; }
-        .file-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #eee; }
+        .files-section { margin-top: 15px; border: 2px solid #000; border-radius: 5px; overflow: hidden; background: rgba(255, 255, 255, 0.8); }
+        .files-header { background: rgba(51, 51, 51, 0.9); color: white; padding: 10px; cursor: pointer; display: flex; justify-content: space-between; }
+        .files-list { display: none; background: transparent; padding: 10px; list-style: none; margin: 0; }
+        .file-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #eee; background: rgba(255, 255, 255, 0.6); border-radius: 4px; margin-bottom: 2px; }
         .file-item a { text-decoration: none; color: #007bff; font-weight: bold; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; }
 
         .btn { padding: 12px 25px; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
-        .btn-edit { background: #f0f0f0; color: #333; border: 1px solid #ccc; }
+        .btn-edit { background: rgba(240, 240, 240, 0.9); color: #333; border: 1px solid #ccc; }
         .is-editing .btn-edit { background: #27ae60 !important; color: white !important; }
         .btn-nav { background: var(--navy); color: white; }
 
-        @media print { .no-print { display: none !important; } .screen { display: block !important; border:none; } .container { width: 100% !important; margin:0; } }
+        /* تعديلات الملاحظات لتتناسب مع الخلفية */
+        #noteVal { 
+            width:100%; height:100px; margin-top:15px; 
+            border:2px solid #000; padding:10px; 
+            font-weight:bold; 
+            background: rgba(255, 255, 255, 0.7); 
+            border-radius: 4px;
+        }
+
+        @media print { 
+            body { background-image: none !important; background-color: white !important; }
+            body::before { display: none !important; }
+            .no-print { display: none !important; } 
+            .screen { display: block !important; border:none; background: white !important; box-shadow: none !important; backdrop-filter: none !important; } 
+            .container { width: 100% !important; margin:0; } 
+            .parts-table, .region-card { background: white !important; }
+        }
     </style>
 </head>
 <body>
@@ -74,7 +139,7 @@
 
     <div class="container">
         <main id="scr1" class="screen active">
-            <h2 style="text-align:center;">Select Unit</h2>
+            <h2 style="text-align:center; color: var(--navy);">Select Unit</h2>
             <div class="vsp-grid" id="vspGrid"></div>
         </main>
 
@@ -93,7 +158,7 @@
                         <input type="color" id="color2" value="#0d2546" onchange="applyStyle(2)">
                     </div>
                 </div>
-                <h2 id="vspLabel">Unit</h2>
+                <h2 id="vspLabel" style="color: var(--navy);">Unit</h2>
                 <button class="btn btn-nav" onclick="nav(1)">BACK</button>
             </div>
             <div id="regionsContainer"></div>
@@ -119,8 +184,8 @@
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <h2 id="partLabel" style="margin:0;">Spare Part</h2>
-                    <input type="number" id="rowsLimit" value="30" onchange="updateRowsLimit(this.value)" style="width:50px; text-align:center; border:2px solid var(--gold);">
+                    <h2 id="partLabel" style="margin:0; color: var(--navy);">Spare Part</h2>
+                    <input type="number" id="rowsLimit" value="30" onchange="updateRowsLimit(this.value)" style="width:50px; text-align:center; border:2px solid var(--gold); background: rgba(255,255,255,0.8); border-radius: 4px;">
                 </div>
                 <button class="btn btn-nav" onclick="nav(2)">BACK</button>
             </div>
@@ -140,13 +205,13 @@
                 <ul class="files-list" id="attachedFileList"></ul>
             </div>
 
-            <textarea id="noteVal" style="width:100%; height:100px; margin-top:15px; border:2px solid #000; padding:10px; font-weight:bold;" placeholder="Notes..."></textarea>
+            <textarea id="noteVal" placeholder="Notes..."></textarea>
             <button class="btn no-print" style="width:100%; margin-top:20px; background:#000; color:#fff;" onclick="window.print()">PRINT TO PDF</button>
         </main>
     </div>
 
     <script>
-        // استرجاع اللوكال ستورج فوراً - كل جهاز له داتا خاصة
+        // --- نفس الكود البرمجي ونظام localStorage بدون أي تغيير ---
         let db = JSON.parse(localStorage.getItem('sca_local_v1')) || { 
             units:['VSP 10','VSP 12','VSP 14','VSP 16','VSP 24','VSP 28','VSP 32'], 
             storage:{}, 
@@ -177,16 +242,16 @@
             c.innerHTML = db.storage[curU].map((r, i) => `
                 <div class="region-card">
                     <div class="region-main">
-                        ${isEdit?`<button style="background:red; color:white; border:none; width:40px; height:100%; cursor:pointer;" onclick="remR(${i})">X</button>`:''}
+                        ${isEdit?`<button style="background:#e74c3c; color:white; border:none; width:40px; height:100%; cursor:pointer;" onclick="remR(${i})">X</button>`:''}
                         <button class="region-name" onclick="goRep(${i})" style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1.4rem'}; color:${r.style?.color || 'var(--navy)'};">
-                            ${isEdit?`<input type="text" value="${r.name}" style="width:90%; border:none; text-align:center; font-weight:bold; color:inherit; font-size:inherit;" onchange="upN(${i},this.value)" onclick="event.stopPropagation()">`:r.name}
+                            ${isEdit?`<input type="text" value="${r.name}" style="width:90%; border:none; text-align:center; font-weight:bold; color:inherit; font-size:inherit; background:transparent;" onchange="upN(${i},this.value)" onclick="event.stopPropagation()">`:r.name}
                         </button>
                         <div class="region-count-box" onclick="handleGoldClick(${i})">
-                            <input type="number" class="region-count-input" value="${r.code}" ${isEdit ? '' : 'readonly'} onchange="autoSubs(${i}, this.value)" onclick="event.stopPropagation()">
+                            <input type="number" class="region-count-input" value="${r.code}" ${isEdit ? '' : 'readonly'} onchange="autoSubs(${i}, this.value)" onclick="${isEdit ? 'event.stopPropagation()' : 'handleGoldClick('+i+'); event.stopPropagation()'}">
                         </div>
                     </div>
                     <div id="sub-box-${i}" class="sub-fields">
-                        ${(r.subs || []).map((s, si) => `<div class="sub-row"><span>${si+1}.</span><input type="text" value="${s}" ${isEdit?'':'disabled'} onchange="upSub(${i},${si},this.value)"></div>`).join('')}
+                        ${(r.subs || []).map((s, si) => `<div class="sub-row"><span style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1rem'}; color:${r.style?.color || 'var(--navy)'};">${si+1}.</span><input type="text" value="${s}" ${isEdit?'':'disabled'} onchange="upSub(${i},${si},this.value)" style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1rem'}; color:${r.style?.color || 'var(--navy)'};"></div>`).join('')}
                     </div>
                 </div>
             `).join('') + (isEdit?`<button class="btn" style="width:100%; background:#27ae60; color:white; margin-top:10px;" onclick="addR()">+ Add New Area</button>`:'');
@@ -205,6 +270,8 @@
                     <td><input type="text" value="${p.pn||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'pn',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td></tr>`;
             }
             document.getElementById('noteVal').value = r.note || '';
+            const nv = document.getElementById('noteVal');
+            nv.style.fontFamily = style.font; nv.style.fontSize = style.size + 'px'; nv.style.color = style.color;
             document.getElementById('partLabel').innerText = r.name;
             renderFilesList();
         }
@@ -226,13 +293,13 @@
             const r = db.storage[curU][curRIdx];
             const list = document.getElementById('attachedFileList');
             const count = document.getElementById('fileCount');
-            if(!r.files || r.files.length === 0) { list.innerHTML = '<li>No files.</li>'; count.innerText = "0"; return; }
+            if(!r.files || r.files.length === 0) { list.innerHTML = '<li style="color:#666; text-align:center;">No files.</li>'; count.innerText = "0"; return; }
             count.innerText = r.files.length;
             list.innerHTML = r.files.map((f, i) => `
                 <li class="file-item">
                     <span>📄</span>
                     <a href="${f.data}" download="${f.name}">${f.name}</a>
-                    ${isEdit?`<button onclick="remFile(${i})" style="color:red; border:none; background:none; cursor:pointer;">Delete</button>`:''}
+                    ${isEdit?`<button onclick="remFile(${i})" style="color:#e74c3c; border:none; background:none; cursor:pointer; font-weight:bold;">✕</button>`:''}
                 </li>
             `).join('');
         }
@@ -254,7 +321,7 @@
         function updateUI(s) {
             const btn = document.getElementById('btnEdit'+s); if(btn) btn.innerText = isEdit?"✔ SAVE DATA":"✎ EDIT MODE";
             const tools = document.getElementById('tools'+s); if(tools) tools.style.display = isEdit ? 'flex' : 'none';
-            if(s===3) { document.getElementById('fileWrapper').style.display = isEdit ? 'block' : 'none'; renderParts(); }
+            if(s===3) { document.getElementById('fileWrapper').style.display = isEdit ? 'block' : 'none'; renderParts(); document.getElementById('noteVal').disabled=!isEdit;}
             if(s===2) renderReg();
         }
 
