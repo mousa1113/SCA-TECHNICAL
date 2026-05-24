@@ -3,350 +3,633 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCA Technical Inspection - Pro</title>
+    <title>SCA Technical Inspection</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Tajawal:wght@400;700&family=Almarai:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
-        :root { 
-            --navy: #0d2546; 
-            --gold: #c5a059; 
-            /* خلفية بيضاء بشفافية بسيطة للعناصر */
-            --bg-panel: rgba(255, 255, 255, 0.9); 
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            margin: 0; 
-            /* --- تعديل الخلفية لتشمل الصورة --- */
-            background-image: url('image_5c761b.png'); /* هنا بنحط صورة المركب/الشعار كخلفية */
-            background-attachment: fixed; /* الصورة تفضل ثابتة والموقع بيتحرك فوقها */
-            background-size: cover; /* الصورة تغطي الشاشة كلها */
-            background-position: center; /* تمليط الصورة في المنتصف */
-            background-repeat: no-repeat;
+        :root { --navy: #0d2546; --gold: #c5a059; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            background: #f0f2f5;
+            color: #222;
         }
 
-        /* إضافة طبقة تعتيم خفيفة فوق صورة الخلفية عشان الكلام يبان */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 37, 70, 0.05); /* تعتيم كحلي خفيف جداً */
-            z-index: -1;
-        }
-
+        /* ── HEADER ── */
         .official-header {
-            display: grid; grid-template-columns: 200px 1fr 200px;
-            border: 2px solid #000; 
-            background: rgba(255, 255, 255, 0.95); /* هيدر أبيض شبه شفاف */
-            width: 1000px; margin: 20px auto; min-height: 120px;
-            border-radius: 8px; overflow: hidden;
+            display: grid; grid-template-columns: 180px 1fr 180px;
+            border: 2px solid #000;
+            background: #fff;
+            width: 1020px; margin: 22px auto 0; min-height: 110px;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
         .h-logo { display: flex; align-items: center; justify-content: center; padding: 10px; }
-        .h-logo img { max-width: 100%; max-height: 100px; }
+        .h-logo img { max-width: 100%; max-height: 90px; }
         .h-center { display: flex; flex-direction: column; text-align: center; justify-content: center; border-left: 2px solid #000; border-right: 2px solid #000; }
-        .h-line-1 { font-size: 1.4rem; font-weight: bold; color: var(--navy); border-bottom: 2px solid #000; padding: 5px; }
-        .h-line-3 { font-size: 1.6rem; font-weight: 900; background: rgba(238, 238, 238, 0.8); flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .h-line-1 { font-size: 1.35rem; font-weight: bold; color: var(--navy); border-bottom: 2px solid #000; padding: 6px; }
+        .h-line-3 { font-size: 1.5rem; font-weight: 900; background: #f5f5f5; flex-grow: 1; display: flex; align-items: center; justify-content: center; letter-spacing: 0.5px; }
 
-        .container { width: 1000px; margin: 0 auto; padding-bottom: 50px; }
-        
-        /* جعل الشاشات بيضاء شبه شفافة */
-        .screen { 
-            display: none; 
-            background: var(--bg-panel); 
-            padding: 35px; 
-            border: 1px solid rgba(0,0,0,0.1); 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ظل خفيف لإبراز العناصر */
-            backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية وراء العنصر */
-        }
+        /* ── LAYOUT ── */
+        .container { width: 1020px; margin: 0 auto; padding-bottom: 60px; }
+        .screen { display: none; background: #fff; padding: 30px; border: 1px solid #dde; border-radius: 12px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
         .active { display: block; }
 
-        .vsp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        
-        /* كروت الوحدات شبه شفافة */
-        .vsp-card { 
-            background: rgba(255, 255, 255, 0.7); 
-            padding: 30px; 
-            text-align: center; 
-            border: 2px solid rgba(0,0,0,0.05); 
-            font-size: 1.3rem; 
-            font-weight: bold; 
-            cursor: pointer; 
-            border-radius: 10px; 
-            transition: 0.3s; 
+        /* ── TOOLBAR ── */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 2px solid #eee; }
+        .toolbar-left { display: flex; align-items: center; gap: 8px; }
+        .btn { padding: 9px 20px; border: none; font-weight: 700; cursor: pointer; border-radius: 7px; font-size: 0.88rem; transition: 0.2s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-edit { background: #f0f0f0; color: #333; border: 1.5px solid #ccc; }
+        .btn-edit.active-edit { background: #27ae60; color: #fff; border-color: #27ae60; }
+        .btn-nav { background: var(--navy); color: #fff; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn-success { background: #27ae60; color: #fff; }
+        .screen-title { font-size: 1.2rem; font-weight: 800; color: var(--navy); margin: 0; }
+
+        /* ── INLINE STYLE POPUP ── */
+        .style-popup {
+            display: none; position: absolute; z-index: 999;
+            background: #fff; border: 1.5px solid #ccc; border-radius: 8px;
+            padding: 8px 12px; gap: 8px; align-items: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            flex-wrap: wrap;
         }
-        .vsp-card:hover { border-color: var(--gold); background: rgba(255, 255, 255, 0.9); }
-        .vsp-card.selected { background: var(--navy) !important; color: var(--gold) !important; }
-
-        .region-card { border: 2px solid #000; margin-bottom: 15px; border-radius: 8px; overflow: hidden; background: rgba(255, 255, 255, 0.8); }
-        .region-main { display: flex; height: 70px; align-items: center; }
-        .region-name { flex-grow: 1; border: none; background: transparent; font-size: 1.4rem; font-weight: bold; cursor: pointer; text-align: center; border-right: 2px solid #000; height: 100%; color: var(--navy); }
-        .region-count-box { width: 110px; height: 100%; background: var(--gold); display: flex; align-items: center; justify-content: center; }
-        .region-count-input { width: 100%; height: 100%; border: none; background: transparent; font-size: 2.2rem; font-weight: 900; text-align: center; outline: none; }
-        
-        .sub-fields { display: none; background: rgba(253, 253, 253, 0.7); padding: 20px; border-top: 2px solid #000; }
-        .sub-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        .sub-row input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-weight: bold; background: rgba(255, 255, 255, 0.8); }
-
-        .parts-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; background: rgba(255, 255, 255, 0.8); }
-        .parts-table th, .parts-table td { border: 2px solid #000 !important; padding: 5px; text-align: center; }
-        .parts-table th { background: rgba(238, 238, 238, 0.9); font-weight: bold; }
-        .parts-table input { width: 100%; height: 35px; border: none; text-align: center; font-size: 1rem; font-weight: bold; outline: none; background: transparent; }
-
-        .text-tools-bar { display: none; align-items: center; gap: 10px; background: rgba(248, 249, 250, 0.9); padding: 8px 15px; border: 1px solid #ddd; border-radius: 8px; margin-right: 10px; }
-        .text-tools-bar select, .text-tools-bar input { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
-
-        .files-section { margin-top: 15px; border: 2px solid #000; border-radius: 5px; overflow: hidden; background: rgba(255, 255, 255, 0.8); }
-        .files-header { background: rgba(51, 51, 51, 0.9); color: white; padding: 10px; cursor: pointer; display: flex; justify-content: space-between; }
-        .files-list { display: none; background: transparent; padding: 10px; list-style: none; margin: 0; }
-        .file-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #eee; background: rgba(255, 255, 255, 0.6); border-radius: 4px; margin-bottom: 2px; }
-        .file-item a { text-decoration: none; color: #007bff; font-weight: bold; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; }
-
-        .btn { padding: 12px 25px; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
-        .btn-edit { background: rgba(240, 240, 240, 0.9); color: #333; border: 1px solid #ccc; }
-        .is-editing .btn-edit { background: #27ae60 !important; color: white !important; }
-        .btn-nav { background: var(--navy); color: white; }
-
-        /* تعديلات الملاحظات لتتناسب مع الخلفية */
-        #noteVal { 
-            width:100%; height:100px; margin-top:15px; 
-            border:2px solid #000; padding:10px; 
-            font-weight:bold; 
-            background: rgba(255, 255, 255, 0.7); 
-            border-radius: 4px;
+        .style-popup.open { display: flex; }
+        .style-popup select, .style-popup input[type=number] {
+            padding: 4px 6px; border: 1px solid #ccc; border-radius: 5px; font-size: 0.82rem;
         }
+        .style-popup input[type=color] { width: 32px; height: 28px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; padding: 1px; }
+        .style-popup label { font-size: 0.75rem; color: #777; }
+        .popup-close { background: none; border: none; cursor: pointer; font-size: 1rem; color: #999; margin-left: 4px; }
 
-        @media print { 
-            body { background-image: none !important; background-color: white !important; }
-            body::before { display: none !important; }
-            .no-print { display: none !important; } 
-            .screen { display: block !important; border:none; background: white !important; box-shadow: none !important; backdrop-filter: none !important; } 
-            .container { width: 100% !important; margin:0; } 
-            .parts-table, .region-card { background: white !important; }
+        /* ── SCREEN 1 — VSP GRID ── */
+        .vsp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .vsp-card-wrap { position: relative; }
+        .vsp-card {
+            background: #fff;
+            padding: 28px 10px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.2s;
+            width: 100%;
+        }
+        .vsp-card:hover { border-color: var(--gold); box-shadow: 0 2px 10px rgba(197,160,89,0.2); }
+        .vsp-card.last-selected { border-color: var(--navy); background: var(--navy); color: var(--gold); }
+        .vsp-style-btn {
+            display: none; position: absolute; top: 4px; right: 4px;
+            background: rgba(255,255,255,0.9); border: 1px solid #ddd;
+            border-radius: 5px; padding: 2px 6px; font-size: 0.7rem; cursor: pointer;
+            color: #555;
+        }
+        .vsp-card-wrap:hover .vsp-style-btn { display: block; }
+
+        /* ── SCREEN 2 — REGIONS ── */
+        .region-card {
+            border: 2px solid #ddd;
+            margin-bottom: 14px;
+            border-radius: 10px;
+            overflow: visible;
+            background: #fff;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+        .region-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .region-main { display: flex; height: 66px; align-items: stretch; }
+        .region-del-btn { background: #e74c3c; color: #fff; border: none; width: 38px; cursor: pointer; font-size: 1rem; border-right: 2px solid #ddd; }
+        .region-name-btn {
+            flex-grow: 1; border: none; background: transparent;
+            font-size: 1.3rem; font-weight: 700; cursor: pointer;
+            text-align: center; height: 100%; color: var(--navy);
+            border-right: 2px solid #ddd; padding: 0 10px;
+            transition: background 0.15s;
+        }
+        .region-name-btn:hover { background: #f9f9f9; }
+        .region-name-input {
+            flex-grow: 1; border: none; background: #fffbe6;
+            font-size: 1.3rem; font-weight: 700; text-align: center;
+            height: 100%; color: var(--navy); border-right: 2px solid #ddd;
+            padding: 0 10px; outline: none;
+        }
+        .region-count-box {
+            width: 100px; background: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; position: relative;
+        }
+        .region-count-input {
+            width: 100%; height: 100%; border: none; background: transparent;
+            font-size: 2rem; font-weight: 900; text-align: center; outline: none;
+            cursor: pointer;
+        }
+        .region-style-btn {
+            width: 30px; background: rgba(255,255,255,0.25); border: none;
+            cursor: pointer; font-size: 0.75rem; color: #333; border-left: 1px solid rgba(0,0,0,0.1);
+        }
+        .region-style-btn:hover { background: rgba(255,255,255,0.5); }
+        .sub-fields { display: none; background: #fafafa; padding: 16px 20px; border-top: 2px solid #eee; }
+        .sub-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+        .sub-row span { font-weight: 700; color: #888; min-width: 22px; }
+        .sub-row input { flex-grow: 1; padding: 8px 12px; border: 1.5px solid #ddd; border-radius: 6px; font-size: 0.95rem; background: #fff; }
+        .sub-row input:focus { border-color: var(--gold); outline: none; }
+        .sub-row input:disabled { background: #f5f5f5; color: #333; border-color: #e5e5e5; cursor: default; }
+
+        /* ── SCREEN 3 — PARTS TABLE ── */
+        .parts-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
+        .parts-table th, .parts-table td { border: 1.5px solid #bbb; padding: 3px; text-align: center; }
+        .parts-table th { background: #f0f0f0; font-weight: 700; font-size: 0.9rem; padding: 8px 4px; }
+        .parts-table td { padding: 2px; }
+        .parts-table .row-num { background: #f8f8f8; color: #999; font-size: 0.82rem; }
+        .cell-wrap { position: relative; display: flex; align-items: center; }
+        .cell-input {
+            width: 100%; height: 34px; border: none; text-align: center;
+            font-size: 0.95rem; outline: none; background: transparent; padding: 0 4px;
+        }
+        .cell-input:focus { background: #fffbe6; }
+        .cell-input:disabled { color: #333; cursor: default; }
+        .cell-style-btn {
+            display: none; position: absolute; right: 1px; top: 1px;
+            background: rgba(197,160,89,0.15); border: none; border-radius: 3px;
+            font-size: 0.6rem; cursor: pointer; padding: 1px 3px; color: var(--navy); z-index: 2;
+        }
+        .cell-wrap:hover .cell-style-btn { display: block; }
+
+        /* ── NOTES & FILES ── */
+        #noteVal { width:100%; height:90px; margin-top:14px; border:1.5px solid #ddd; padding:10px 14px; font-size:0.95rem; border-radius: 7px; resize: vertical; }
+        #noteVal:focus { border-color: var(--gold); outline: none; }
+        .files-section { margin-top: 14px; border: 1.5px solid #ddd; border-radius: 8px; overflow: hidden; }
+        .files-header { background: #333; color: #fff; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem; }
+        .files-list { display: none; padding: 10px; list-style: none; margin: 0; }
+        .file-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 6px; margin-bottom: 4px; background: #f9f9f9; border: 1px solid #eee; }
+        .file-item a { text-decoration: none; color: #007bff; font-weight: 600; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* ── ROWS CONTROL ── */
+        .rows-control { display: flex; align-items: center; gap: 6px; }
+        .rows-control label { font-size: 0.8rem; color: #888; }
+        .rows-control input { width: 52px; text-align: center; border: 1.5px solid var(--gold); border-radius: 5px; padding: 4px; font-weight: 700; }
+
+        /* ── PRINT ── */
+        @media print {
+            body { background: #fff !important; }
+            .no-print { display: none !important; }
+            .screen { display: block !important; border: none; box-shadow: none; padding: 0; margin: 0; }
+            .container, .official-header { width: 100% !important; }
+            .official-header { box-shadow: none; }
+            .parts-table th, .parts-table td { border: 1px solid #000 !important; }
         }
     </style>
 </head>
 <body>
 
-    <header class="official-header">
-        <div class="h-logo"><img src="image_5c761b.png"></div>
-        <div class="h-center">
-            <div class="h-line-1">SUEZ CANAL AUTHORITY</div>
-            <div class="h-line-3">TECHNICAL INSPECTION REPORT</div>
-        </div>
-        <div class="h-logo"><img src="image_5c0103.png"></div>
-    </header>
-
-    <div class="container">
-        <main id="scr1" class="screen active">
-            <h2 style="text-align:center; color: var(--navy);">Select Unit</h2>
-            <div class="vsp-grid" id="vspGrid"></div>
-        </main>
-
-        <main id="scr2" class="screen">
-            <div class="no-print" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div style="display:flex; align-items: center;">
-                    <button class="btn btn-edit" id="btnEdit2" onclick="toggleEdit(2)">✎ EDIT MODE</button>
-                    <div id="tools2" class="text-tools-bar">
-                        <select id="font2" onchange="applyStyle(2)">
-                            <option value="'Segoe UI'">Default</option>
-                            <option value="'Cairo'">Cairo</option>
-                            <option value="'Tajawal'">Tajawal</option>
-                            <option value="'Almarai'">Almarai</option>
-                        </select>
-                        <input type="number" id="size2" value="22" style="width:55px" onchange="applyStyle(2)">
-                        <input type="color" id="color2" value="#0d2546" onchange="applyStyle(2)">
-                    </div>
-                </div>
-                <h2 id="vspLabel" style="color: var(--navy);">Unit</h2>
-                <button class="btn btn-nav" onclick="nav(1)">BACK</button>
-            </div>
-            <div id="regionsContainer"></div>
-        </main>
-
-        <main id="scr3" class="screen">
-            <div class="no-print" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div style="display:flex; align-items: center;">
-                    <button class="btn btn-edit" id="btnEdit3" onclick="toggleEdit(3)">✎ EDIT REPORT</button>
-                    <div id="tools3" class="text-tools-bar">
-                        <select id="font3" onchange="applyStyle(3)">
-                            <option value="'Segoe UI'">Default</option>
-                            <option value="'Cairo'">Cairo</option>
-                            <option value="'Tajawal'">Tajawal</option>
-                            <option value="'Roboto'">Roboto</option>
-                        </select>
-                        <input type="number" id="size3" value="16" style="width:55px" onchange="applyStyle(3)">
-                        <input type="color" id="color3" value="#000000" onchange="applyStyle(3)">
-                        <div id="fileWrapper" style="display:none; border-left:1px solid #ccc; padding-left:10px;">
-                            <label for="fileIn" style="cursor:pointer; background:var(--gold); color:white; padding:5px 10px; border-radius:4px; font-size:12px;">📎 Attach</label>
-                            <input type="file" id="fileIn" hidden multiple onchange="handleFileUpload(this)">
-                        </div>
-                    </div>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <h2 id="partLabel" style="margin:0; color: var(--navy);">Spare Part</h2>
-                    <input type="number" id="rowsLimit" value="30" onchange="updateRowsLimit(this.value)" style="width:50px; text-align:center; border:2px solid var(--gold); background: rgba(255,255,255,0.8); border-radius: 4px;">
-                </div>
-                <button class="btn btn-nav" onclick="nav(2)">BACK</button>
-            </div>
-
-            <table class="parts-table">
-                <thead>
-                    <tr><th style="width:50px;">No.</th><th>Part Name</th><th style="width:80px;">Qty.</th><th style="width:160px;">Part No.</th></tr>
-                </thead>
-                <tbody id="partsTableBody"></tbody>
-            </table>
-
-            <div class="files-section">
-                <div class="files-header" onclick="toggleFiles()">
-                    <span>📁 Files (<span id="fileCount">0</span>)</span>
-                    <span>▼</span>
-                </div>
-                <ul class="files-list" id="attachedFileList"></ul>
-            </div>
-
-            <textarea id="noteVal" placeholder="Notes..."></textarea>
-            <button class="btn no-print" style="width:100%; margin-top:20px; background:#000; color:#fff;" onclick="window.print()">PRINT TO PDF</button>
-        </main>
+<header class="official-header">
+    <div class="h-logo"><img src="image_5c761b.png" alt="Logo"></div>
+    <div class="h-center">
+        <div class="h-line-1">SUEZ CANAL AUTHORITY</div>
+        <div class="h-line-3">TECHNICAL INSPECTION REPORT</div>
     </div>
+    <div class="h-logo"><img src="image_5c0103.png" alt="Logo"></div>
+</header>
 
-    <script>
-        // --- نفس الكود البرمجي ونظام localStorage بدون أي تغيير ---
-        let db = JSON.parse(localStorage.getItem('sca_local_v1')) || { 
-            units:['VSP 10','VSP 12','VSP 14','VSP 16','VSP 24','VSP 28','VSP 32'], 
-            storage:{}, 
-            last:null 
-        };
-        
-        let curU='', curRIdx=-1, isEdit=false;
+<div class="container">
 
-        function save() { localStorage.setItem('sca_local_v1', JSON.stringify(db)); }
+    <!-- ════ SCREEN 1 : SELECT UNIT ════ -->
+    <main id="scr1" class="screen active">
+        <div class="toolbar">
+            <h2 class="screen-title">Select Unit</h2>
+            <button class="btn btn-edit" id="btnEdit1" onclick="toggleEdit(1)">✎ Edit Cards</button>
+        </div>
+        <div class="vsp-grid" id="vspGrid"></div>
+        <!-- popup for VSP card style -->
+        <div class="style-popup" id="popupVsp">
+            <label>Font</label>
+            <select id="fontVsp" onchange="applyVspStyle()">
+                <option value="'Segoe UI'">Default</option>
+                <option value="'Cairo'">Cairo</option>
+                <option value="'Tajawal'">Tajawal</option>
+                <option value="'Almarai'">Almarai</option>
+                <option value="'Roboto'">Roboto</option>
+            </select>
+            <label>Size</label>
+            <input type="number" id="sizeVsp" value="20" style="width:52px" onchange="applyVspStyle()">
+            <label>Text</label>
+            <input type="color" id="colorVspText" value="#0d2546" onchange="applyVspStyle()">
+            <label>BG</label>
+            <input type="color" id="colorVspBg" value="#ffffff" onchange="applyVspStyle()">
+            <button class="popup-close" onclick="closePopup('popupVsp')">✕</button>
+        </div>
+    </main>
 
-        function init() { 
-            document.getElementById('vspGrid').innerHTML = db.units.map(u => 
-                `<div class="vsp-card ${u===db.last?'selected':''}" onclick="nav(2,'${u}')">${u}</div>`
-            ).join(''); 
-        }
+    <!-- ════ SCREEN 2 : REGIONS ════ -->
+    <main id="scr2" class="screen">
+        <div class="toolbar no-print">
+            <div class="toolbar-left">
+                <button class="btn btn-edit" id="btnEdit2" onclick="toggleEdit(2)">✎ Edit Mode</button>
+            </div>
+            <h2 class="screen-title" id="vspLabel">Unit</h2>
+            <button class="btn btn-nav" onclick="nav(1)">← Back</button>
+        </div>
+        <div id="regionsContainer"></div>
+        <!-- per-region style popup — reused, positioned by JS -->
+        <div class="style-popup" id="popupReg">
+            <label>Font</label>
+            <select id="fontReg" onchange="applyRegStyle()">
+                <option value="'Segoe UI'">Default</option>
+                <option value="'Cairo'">Cairo</option>
+                <option value="'Tajawal'">Tajawal</option>
+                <option value="'Almarai'">Almarai</option>
+                <option value="'Roboto'">Roboto</option>
+            </select>
+            <label>Size</label>
+            <input type="number" id="sizeReg" value="22" style="width:52px" onchange="applyRegStyle()">
+            <label>Text</label>
+            <input type="color" id="colorReg" value="#0d2546" onchange="applyRegStyle()">
+            <label>BG</label>
+            <input type="color" id="bgReg" value="#c5a059" onchange="applyRegStyle()">
+            <button class="popup-close" onclick="closePopup('popupReg')">✕</button>
+        </div>
+    </main>
 
-        function nav(s, v) {
-            document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
-            document.getElementById('scr'+s).classList.add('active');
-            if(s===2 && v) { curU=v; db.last=v; save(); renderReg(); }
-            if(s===3) { if(typeof v === 'number') curRIdx=v; renderParts(); }
-            isEdit = false; updateUI(s);
-        }
-
-        function renderReg() {
-            const c = document.getElementById('regionsContainer');
-            if(!db.storage[curU]) db.storage[curU] = [{name:'Main Area', code:1, subs:[''], parts:[], note:'', rowsLimit: 30, style:{}, files:[]}];
-            c.innerHTML = db.storage[curU].map((r, i) => `
-                <div class="region-card">
-                    <div class="region-main">
-                        ${isEdit?`<button style="background:#e74c3c; color:white; border:none; width:40px; height:100%; cursor:pointer;" onclick="remR(${i})">X</button>`:''}
-                        <button class="region-name" onclick="goRep(${i})" style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1.4rem'}; color:${r.style?.color || 'var(--navy)'};">
-                            ${isEdit?`<input type="text" value="${r.name}" style="width:90%; border:none; text-align:center; font-weight:bold; color:inherit; font-size:inherit; background:transparent;" onchange="upN(${i},this.value)" onclick="event.stopPropagation()">`:r.name}
-                        </button>
-                        <div class="region-count-box" onclick="handleGoldClick(${i})">
-                            <input type="number" class="region-count-input" value="${r.code}" ${isEdit ? '' : 'readonly'} onchange="autoSubs(${i}, this.value)" onclick="${isEdit ? 'event.stopPropagation()' : 'handleGoldClick('+i+'); event.stopPropagation()'}">
-                        </div>
-                    </div>
-                    <div id="sub-box-${i}" class="sub-fields">
-                        ${(r.subs || []).map((s, si) => `<div class="sub-row"><span style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1rem'}; color:${r.style?.color || 'var(--navy)'};">${si+1}.</span><input type="text" value="${s}" ${isEdit?'':'disabled'} onchange="upSub(${i},${si},this.value)" style="font-family:${r.style?.font || 'inherit'}; font-size:${r.style?.size || '1rem'}; color:${r.style?.color || 'var(--navy)'};"></div>`).join('')}
-                    </div>
+    <!-- ════ SCREEN 3 : PARTS TABLE ════ -->
+    <main id="scr3" class="screen">
+        <div class="toolbar no-print">
+            <div class="toolbar-left">
+                <button class="btn btn-edit" id="btnEdit3" onclick="toggleEdit(3)">✎ Edit Report</button>
+                <div id="fileWrapper" style="display:none; margin-left:8px;">
+                    <label for="fileIn" style="cursor:pointer; background:var(--gold); color:#fff; padding:7px 12px; border-radius:6px; font-size:0.83rem; font-weight:700;">📎 Attach</label>
+                    <input type="file" id="fileIn" hidden multiple onchange="handleFileUpload(this)">
                 </div>
-            `).join('') + (isEdit?`<button class="btn" style="width:100%; background:#27ae60; color:white; margin-top:10px;" onclick="addR()">+ Add New Area</button>`:'');
-        }
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <h2 id="partLabel" style="margin:0; color:var(--navy);">Area</h2>
+                <div class="rows-control">
+                    <label>Rows</label>
+                    <input type="number" id="rowsLimit" value="30" onchange="updateRowsLimit(this.value)">
+                </div>
+            </div>
+            <button class="btn btn-nav" onclick="nav(2)">← Back</button>
+        </div>
 
-        function renderParts() {
-            const r = db.storage[curU][curRIdx];
-            const limit = r.rowsLimit || 30;
-            const style = r.style3 || {font: "'Segoe UI'", size: 16, color: "#000000"};
-            const b = document.getElementById('partsTableBody'); b.innerHTML = '';
-            for(let i=0; i < limit; i++) {
-                const p = (r.parts && r.parts[i]) ? r.parts[i] : {n:'', q:'', pn:''};
-                b.innerHTML += `<tr><td>${i+1}</td>
-                    <td><input type="text" value="${p.n||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'n',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color}; text-align:left; padding-left:10px;"></td>
-                    <td><input type="text" value="${p.q||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'q',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td>
-                    <td><input type="text" value="${p.pn||''}" ${isEdit?'':'disabled'} onchange="upP(${i},'pn',this.value)" style="font-family:${style.font}; font-size:${style.size}px; color:${style.color};"></td></tr>`;
-            }
-            document.getElementById('noteVal').value = r.note || '';
-            const nv = document.getElementById('noteVal');
-            nv.style.fontFamily = style.font; nv.style.fontSize = style.size + 'px'; nv.style.color = style.color;
-            document.getElementById('partLabel').innerText = r.name;
-            renderFilesList();
-        }
+        <table class="parts-table">
+            <thead>
+                <tr>
+                    <th style="width:46px;">No.</th>
+                    <th>Part Name</th>
+                    <th style="width:80px;">Qty.</th>
+                    <th style="width:155px;">Part No.</th>
+                </tr>
+            </thead>
+            <tbody id="partsTableBody"></tbody>
+        </table>
 
-        function handleFileUpload(input) {
-            const r = db.storage[curU][curRIdx];
-            if(!r.files) r.files = [];
-            Array.from(input.files).forEach(f => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    r.files.push({ name: f.name, data: e.target.result });
-                    save(); renderFilesList();
-                };
-                reader.readAsDataURL(f);
-            });
-        }
+        <div class="files-section">
+            <div class="files-header" onclick="toggleFiles()">
+                <span>📁 Attached Files (<span id="fileCount">0</span>)</span>
+                <span>▼</span>
+            </div>
+            <ul class="files-list" id="attachedFileList"></ul>
+        </div>
 
-        function renderFilesList() {
-            const r = db.storage[curU][curRIdx];
-            const list = document.getElementById('attachedFileList');
-            const count = document.getElementById('fileCount');
-            if(!r.files || r.files.length === 0) { list.innerHTML = '<li style="color:#666; text-align:center;">No files.</li>'; count.innerText = "0"; return; }
-            count.innerText = r.files.length;
-            list.innerHTML = r.files.map((f, i) => `
-                <li class="file-item">
-                    <span>📄</span>
-                    <a href="${f.data}" download="${f.name}">${f.name}</a>
-                    ${isEdit?`<button onclick="remFile(${i})" style="color:#e74c3c; border:none; background:none; cursor:pointer; font-weight:bold;">✕</button>`:''}
-                </li>
-            `).join('');
-        }
+        <textarea id="noteVal" placeholder="Notes..."></textarea>
+        <button class="btn no-print" style="width:100%; margin-top:18px; background:#111; color:#fff; font-size:1rem;" onclick="window.print()">🖨 PRINT TO PDF</button>
 
-        function remFile(i) { db.storage[curU][curRIdx].files.splice(i,1); save(); renderFilesList(); }
-        function toggleFiles() { const l = document.getElementById('attachedFileList'); l.style.display = (l.style.display==='block')?'none':'block'; }
+        <!-- per-cell style popup -->
+        <div class="style-popup" id="popupCell">
+            <label>Font</label>
+            <select id="fontCell" onchange="applyCellStyle()">
+                <option value="'Segoe UI'">Default</option>
+                <option value="'Cairo'">Cairo</option>
+                <option value="'Tajawal'">Tajawal</option>
+                <option value="'Almarai'">Almarai</option>
+                <option value="'Roboto'">Roboto</option>
+            </select>
+            <label>Size</label>
+            <input type="number" id="sizeCell" value="15" style="width:52px" onchange="applyCellStyle()">
+            <label>Color</label>
+            <input type="color" id="colorCell" value="#000000" onchange="applyCellStyle()">
+            <label>BG</label>
+            <input type="color" id="bgCell" value="#ffffff" onchange="applyCellStyle()">
+            <button class="popup-close" onclick="closePopup('popupCell')">✕</button>
+        </div>
+    </main>
 
-        function applyStyle(screen) {
-            const f = document.getElementById('font'+screen).value;
-            const s = document.getElementById('size'+screen).value;
-            const c = document.getElementById('color'+screen).value;
-            if(screen === 2) db.storage[curU].forEach(r => r.style = {font:f, size:s+'px', color:c});
-            else db.storage[curU][curRIdx].style3 = {font:f, size:s, color:c};
-            save(); renderParts(); if(screen===2) renderReg();
-        }
+</div><!-- /container -->
 
-        function toggleEdit(s) { isEdit = !isEdit; updateUI(s); if(!isEdit) save(); }
-        
-        function updateUI(s) {
-            const btn = document.getElementById('btnEdit'+s); if(btn) btn.innerText = isEdit?"✔ SAVE DATA":"✎ EDIT MODE";
-            const tools = document.getElementById('tools'+s); if(tools) tools.style.display = isEdit ? 'flex' : 'none';
-            if(s===3) { document.getElementById('fileWrapper').style.display = isEdit ? 'block' : 'none'; renderParts(); document.getElementById('noteVal').disabled=!isEdit;}
-            if(s===2) renderReg();
-        }
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+let db = JSON.parse(localStorage.getItem('sca_v2')) || {
+    units: ['VSP 10','VSP 12','VSP 14','VSP 16','VSP 24','VSP 28','VSP 32'],
+    unitStyles: {},   // { 'VSP 10': {font, size, color, bg} }
+    storage: {},
+    last: null
+};
+let curU = '', curRIdx = -1, isEdit = false;
+let curVspCard = null;   // which VSP card is being styled
+let curRegIdx = null;    // which region is being styled
+let curCellKey = null;   // 'rowIndex:col'
 
-        function handleGoldClick(idx) { if(!isEdit) { let el = document.getElementById('sub-box-'+idx); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; } }
-        function autoSubs(idx, val) {
-            let num = Math.max(0, parseInt(val) || 0);
-            let r = db.storage[curU][idx];
-            while(r.subs.length < num) r.subs.push('');
-            r.subs = r.subs.slice(0, num); r.code = num;
-            save(); renderReg(); document.getElementById('sub-box-'+idx).style.display = 'block'; 
-        }
+function save() { localStorage.setItem('sca_v2', JSON.stringify(db)); }
 
-        function updateRowsLimit(v) { db.storage[curU][curRIdx].rowsLimit = v; save(); renderParts(); }
-        function goRep(i) { if(!isEdit) { curRIdx=i; nav(3); } }
-        function upN(i,v) { db.storage[curU][i].name=v; save(); }
-        function upSub(i,si,v) { db.storage[curU][i].subs[si]=v; save(); }
-        function upP(i,k,v) { 
-            if(!db.storage[curU][curRIdx].parts[i]) db.storage[curU][curRIdx].parts[i]={n:'',q:'',pn:''}; 
-            db.storage[curU][curRIdx].parts[i][k]=v; save(); 
-        }
-        function addR() { db.storage[curU].push({name:'New Area', code:1, subs:[''], parts:[], note:'', rowsLimit: 30, style:{}, files:[]}); renderReg(); }
-        function remR(i) { if(confirm("Delete Area?")) { db.storage[curU].splice(i,1); save(); renderReg(); } }
-        document.getElementById('noteVal').oninput = (e) => { db.storage[curU][curRIdx].note = e.target.value; save(); };
+// ═══════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════
+function nav(s, v) {
+    closeAllPopups();
+    document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+    document.getElementById('scr' + s).classList.add('active');
+    isEdit = false;
+    if (s === 1) { renderVsp(); updateUI(1); }
+    if (s === 2 && v) { curU = v; db.last = v; save(); }
+    if (s === 2) { document.getElementById('vspLabel').innerText = curU; renderReg(); updateUI(2); }
+    if (s === 3) { if (typeof v === 'number') curRIdx = v; renderParts(); updateUI(3); }
+}
 
-        init();
-    </script>
+// ═══════════════════════════════════════════════
+//  SCREEN 1 — VSP
+// ═══════════════════════════════════════════════
+function renderVsp() {
+    document.getElementById('vspGrid').innerHTML = db.units.map((u, idx) => {
+        const st = db.unitStyles[u] || {};
+        const bgColor = st.bg || '#ffffff';
+        const textColor = st.color || '#0d2546';
+        const font = st.font || "'Segoe UI'";
+        const size = st.size || 20;
+        const isLast = u === db.last;
+        return `
+        <div class="vsp-card-wrap">
+            <button class="vsp-card ${isLast ? 'last-selected' : ''}"
+                onclick="nav(2,'${u}')"
+                style="font-family:${font}; font-size:${size}px; color:${isLast?'var(--gold)':textColor}; background:${isLast?'var(--navy)':bgColor};">
+                ${u}
+            </button>
+            ${isEdit ? `<button class="vsp-style-btn" onclick="openVspPopup(event,'${u}',${idx})">⚙ Style</button>` : ''}
+        </div>`;
+    }).join('');
+}
+
+function openVspPopup(e, unitName, idx) {
+    e.stopPropagation();
+    curVspCard = unitName;
+    const st = db.unitStyles[unitName] || {};
+    document.getElementById('fontVsp').value = st.font || "'Segoe UI'";
+    document.getElementById('sizeVsp').value = st.size || 20;
+    document.getElementById('colorVspText').value = st.color || '#0d2546';
+    document.getElementById('colorVspBg').value = st.bg || '#ffffff';
+    positionPopup('popupVsp', e.target);
+}
+function applyVspStyle() {
+    if (!curVspCard) return;
+    db.unitStyles[curVspCard] = {
+        font: document.getElementById('fontVsp').value,
+        size: parseInt(document.getElementById('sizeVsp').value),
+        color: document.getElementById('colorVspText').value,
+        bg: document.getElementById('colorVspBg').value
+    };
+    save(); renderVsp();
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 2 — REGIONS
+// ═══════════════════════════════════════════════
+function ensureStorage() {
+    if (!db.storage[curU]) db.storage[curU] = [
+        { name: 'Main Area', code: 1, subs: [''], parts: [], note: '', rowsLimit: 30, style: {}, cellStyles: {}, files: [] }
+    ];
+}
+
+function renderReg() {
+    ensureStorage();
+    const c = document.getElementById('regionsContainer');
+    c.innerHTML = db.storage[curU].map((r, i) => {
+        const st = r.style || {};
+        const nameColor = st.color || 'var(--navy)';
+        const nameFont = st.font || 'inherit';
+        const nameSize = st.size || '1.3rem';
+        const goldBg = st.bg || '#c5a059';
+        return `
+        <div class="region-card" id="rc-${i}">
+            <div class="region-main">
+                ${isEdit ? `<button class="region-del-btn" onclick="remR(${i})">✕</button>` : ''}
+                ${isEdit
+                    ? `<input class="region-name-input" value="${r.name}" style="font-family:${nameFont}; font-size:${nameSize}; color:${nameColor};" onchange="upN(${i},this.value)">`
+                    : `<button class="region-name-btn" onclick="goRep(${i})" style="font-family:${nameFont}; font-size:${nameSize}; color:${nameColor};">${r.name}</button>`
+                }
+                <div class="region-count-box" style="background:${goldBg};" onclick="handleGoldClick(${i})">
+                    <input type="number" class="region-count-input" value="${r.code}"
+                        onchange="autoSubs(${i}, this.value)"
+                        onclick="event.stopPropagation()">
+                    ${isEdit ? `<button class="region-style-btn" onclick="openRegPopup(event,${i})" title="Style">⚙</button>` : ''}
+                </div>
+            </div>
+            <div id="sub-box-${i}" class="sub-fields">
+                ${(r.subs || []).map((s, si) => `
+                    <div class="sub-row">
+                        <span>${si + 1}.</span>
+                        <input type="text" value="${s}" ${isEdit ? '' : 'disabled'}
+                            onchange="upSub(${i},${si},this.value)"
+                            style="font-family:${nameFont}; font-size:${nameSize}; color:${nameColor};">
+                    </div>`).join('')}
+            </div>
+        </div>`;
+    }).join('') + (isEdit
+        ? `<button class="btn btn-success" style="width:100%; margin-top:12px;" onclick="addR()">＋ Add New Area</button>`
+        : '');
+}
+
+function openRegPopup(e, idx) {
+    e.stopPropagation();
+    curRegIdx = idx;
+    const st = db.storage[curU][idx].style || {};
+    document.getElementById('fontReg').value = st.font || "'Segoe UI'";
+    document.getElementById('sizeReg').value = parseInt(st.size) || 22;
+    document.getElementById('colorReg').value = st.color || '#0d2546';
+    document.getElementById('bgReg').value = st.bg || '#c5a059';
+    positionPopup('popupReg', e.target);
+}
+function applyRegStyle() {
+    if (curRegIdx === null) return;
+    db.storage[curU][curRegIdx].style = {
+        font: document.getElementById('fontReg').value,
+        size: document.getElementById('sizeReg').value + 'px',
+        color: document.getElementById('colorReg').value,
+        bg: document.getElementById('bgReg').value
+    };
+    save(); renderReg();
+}
+
+function handleGoldClick(idx) {
+    const el = document.getElementById('sub-box-' + idx);
+    el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+function autoSubs(idx, val) {
+    let num = Math.max(0, parseInt(val) || 0);
+    let r = db.storage[curU][idx];
+    while (r.subs.length < num) r.subs.push('');
+    r.subs = r.subs.slice(0, num); r.code = num;
+    save(); renderReg();
+    setTimeout(() => { const el = document.getElementById('sub-box-' + idx); if (el) el.style.display = 'block'; }, 10);
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 3 — PARTS TABLE  (per-cell styling)
+// ═══════════════════════════════════════════════
+function renderParts() {
+    const r = db.storage[curU][curRIdx];
+    const limit = r.rowsLimit || 30;
+    const cellStyles = r.cellStyles || {};
+    const b = document.getElementById('partsTableBody');
+    b.innerHTML = '';
+    for (let i = 0; i < limit; i++) {
+        const p = (r.parts && r.parts[i]) ? r.parts[i] : { n: '', q: '', pn: '' };
+        const cols = ['n', 'q', 'pn'];
+        const tds = cols.map(col => {
+            const key = i + ':' + col;
+            const cs = cellStyles[key] || {};
+            const font = cs.font || "'Segoe UI'";
+            const size = cs.size || 15;
+            const color = cs.color || '#000';
+            const bg = cs.bg || 'transparent';
+            const align = col === 'n' ? 'left; padding-left:10px' : 'center';
+            return `<td>
+                <div class="cell-wrap">
+                    <input class="cell-input" type="text" value="${p[col] || ''}"
+                        ${isEdit ? '' : 'disabled'}
+                        onchange="upP(${i},'${col}',this.value)"
+                        style="font-family:${font}; font-size:${size}px; color:${color}; background:${bg}; text-align:${align};">
+                    <button class="cell-style-btn" onclick="openCellPopup(event,${i},'${col}')">⚙</button>
+                </div>
+            </td>`;
+        }).join('');
+        b.innerHTML += `<tr><td class="row-num">${i + 1}</td>${tds}</tr>`;
+    }
+    document.getElementById('partLabel').innerText = r.name;
+    document.getElementById('rowsLimit').value = limit;
+    const nv = document.getElementById('noteVal');
+    nv.value = r.note || '';
+    nv.disabled = !isEdit;
+    renderFilesList();
+}
+
+function openCellPopup(e, row, col) {
+    e.stopPropagation();
+    curCellKey = row + ':' + col;
+    const cs = (db.storage[curU][curRIdx].cellStyles || {})[curCellKey] || {};
+    document.getElementById('fontCell').value = cs.font || "'Segoe UI'";
+    document.getElementById('sizeCell').value = cs.size || 15;
+    document.getElementById('colorCell').value = cs.color || '#000000';
+    document.getElementById('bgCell').value = cs.bg || '#ffffff';
+    positionPopup('popupCell', e.target);
+}
+function applyCellStyle() {
+    if (!curCellKey) return;
+    if (!db.storage[curU][curRIdx].cellStyles) db.storage[curU][curRIdx].cellStyles = {};
+    db.storage[curU][curRIdx].cellStyles[curCellKey] = {
+        font: document.getElementById('fontCell').value,
+        size: parseInt(document.getElementById('sizeCell').value),
+        color: document.getElementById('colorCell').value,
+        bg: document.getElementById('bgCell').value
+    };
+    save(); renderParts();
+}
+
+// ═══════════════════════════════════════════════
+//  FILES
+// ═══════════════════════════════════════════════
+function handleFileUpload(input) {
+    const r = db.storage[curU][curRIdx];
+    if (!r.files) r.files = [];
+    Array.from(input.files).forEach(f => {
+        const reader = new FileReader();
+        reader.onload = (e) => { r.files.push({ name: f.name, data: e.target.result }); save(); renderFilesList(); };
+        reader.readAsDataURL(f);
+    });
+}
+function renderFilesList() {
+    const r = db.storage[curU][curRIdx];
+    const list = document.getElementById('attachedFileList');
+    const count = document.getElementById('fileCount');
+    if (!r.files || r.files.length === 0) { list.innerHTML = '<li style="color:#999; text-align:center; padding:8px;">No files attached.</li>'; count.innerText = '0'; return; }
+    count.innerText = r.files.length;
+    list.innerHTML = r.files.map((f, i) => `
+        <li class="file-item">
+            <span>📄</span>
+            <a href="${f.data}" download="${f.name}">${f.name}</a>
+            ${isEdit ? `<button onclick="remFile(${i})" style="color:#e74c3c;border:none;background:none;cursor:pointer;font-weight:700;">✕</button>` : ''}
+        </li>`).join('');
+}
+function remFile(i) { db.storage[curU][curRIdx].files.splice(i, 1); save(); renderFilesList(); }
+function toggleFiles() { const l = document.getElementById('attachedFileList'); l.style.display = (l.style.display === 'block') ? 'none' : 'block'; }
+
+// ═══════════════════════════════════════════════
+//  EDIT TOGGLE & UI
+// ═══════════════════════════════════════════════
+function toggleEdit(s) {
+    isEdit = !isEdit;
+    if (!isEdit) save();
+    updateUI(s);
+}
+function updateUI(s) {
+    [1, 2, 3].forEach(n => {
+        const b = document.getElementById('btnEdit' + n);
+        if (b) { b.innerText = (s === n && isEdit) ? '✔ Save' : (n === 3 ? '✎ Edit Report' : n === 1 ? '✎ Edit Cards' : '✎ Edit Mode'); }
+        if (b && s === n && isEdit) b.classList.add('active-edit'); else if (b) b.classList.remove('active-edit');
+    });
+    if (s === 1) renderVsp();
+    if (s === 2) renderReg();
+    if (s === 3) {
+        document.getElementById('fileWrapper').style.display = isEdit ? 'block' : 'none';
+        renderParts();
+    }
+}
+
+// ═══════════════════════════════════════════════
+//  POPUP HELPERS
+// ═══════════════════════════════════════════════
+function positionPopup(id, anchor) {
+    closeAllPopups();
+    const pop = document.getElementById(id);
+    const rect = anchor.getBoundingClientRect();
+    pop.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+    pop.style.left = (rect.left + window.scrollX) + 'px';
+    pop.classList.add('open');
+}
+function closePopup(id) { document.getElementById(id).classList.remove('open'); }
+function closeAllPopups() {
+    ['popupVsp', 'popupReg', 'popupCell'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('open'); });
+}
+document.addEventListener('click', e => {
+    if (!e.target.closest('.style-popup') && !e.target.closest('.vsp-style-btn') && !e.target.closest('.region-style-btn') && !e.target.closest('.cell-style-btn')) closeAllPopups();
+});
+
+// ═══════════════════════════════════════════════
+//  DATA HELPERS
+// ═══════════════════════════════════════════════
+function goRep(i) { if (!isEdit) { curRIdx = i; nav(3); } }
+function upN(i, v) { db.storage[curU][i].name = v; save(); }
+function upSub(i, si, v) { db.storage[curU][i].subs[si] = v; save(); }
+function upP(i, k, v) {
+    if (!db.storage[curU][curRIdx].parts[i]) db.storage[curU][curRIdx].parts[i] = { n: '', q: '', pn: '' };
+    db.storage[curU][curRIdx].parts[i][k] = v; save();
+}
+function addR() {
+    db.storage[curU].push({ name: 'New Area', code: 1, subs: [''], parts: [], note: '', rowsLimit: 30, style: {}, cellStyles: {}, files: [] });
+    renderReg();
+}
+function remR(i) { if (confirm('Delete this area?')) { db.storage[curU].splice(i, 1); save(); renderReg(); } }
+function updateRowsLimit(v) { db.storage[curU][curRIdx].rowsLimit = parseInt(v) || 30; save(); renderParts(); }
+
+document.getElementById('noteVal').oninput = e => { if (db.storage[curU] && db.storage[curU][curRIdx]) { db.storage[curU][curRIdx].note = e.target.value; save(); } };
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+nav(1);
+</script>
 </body>
 </html>
