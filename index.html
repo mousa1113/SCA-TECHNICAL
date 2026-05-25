@@ -207,6 +207,7 @@
         <div class="toolbar">
             <h2 class="screen-title">Select Unit</h2>
             <button class="btn btn-edit" id="btnEdit1" onclick="toggleEdit(1)">✎ Edit Cards</button>
+                <button class="btn" style="background:#e74c3c;color:#fff;font-size:0.8rem;" onclick="resetToDefault()" title="Clear saved data and reload defaults">↺ Reset</button>
         </div>
         <div class="vsp-grid" id="vspGrid"></div>
         <!-- popup for VSP card style -->
@@ -346,17 +347,91 @@
 // ═══════════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════════
-let db = JSON.parse(localStorage.getItem('sca_v2')) || {
+const DEFAULT_DB = {
     units: ['VSP 10','VSP 12','VSP 14','VSP 16','VSP 24','VSP 28','VSP 32'],
-    unitStyles: {},   // { 'VSP 10': {font, size, color, bg} }
-    storage: {},
+    unitStyles: {},
+    storage: {
+        'VSP 10': [
+            { name:'ISMAILIA', code:4,  subs:Array(4).fill(''),  parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'GIZA',     code:6,  subs:Array(6).fill(''),  parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'ASHRA',    code:12, subs:Array(12).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'FAYID',    code:16, subs:Array(16).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] }
+        ],
+        'VSP 14': [
+            { name:'ELCAP',  code:62, subs:Array(62).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'ELTINA', code:10, subs:Array(10).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'ELFOUA', code:4,  subs:Array(4).fill(''),  parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] }
+        ],
+        'VSP 16': [
+            { name:'ELMORA',    code:4, subs:Array(4).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'EMLAK',     code:3, subs:Array(3).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'PORTFOUAD', code:2, subs:Array(2).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] }
+        ],
+        'VSP 24': [
+            { name:'BITTERSEA', code:2, subs:Array(2).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] }
+        ],
+        'VSP 28': [
+            { name:'BITTERSEA', code:2, subs:Array(2).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'PORTSAID',  code:6, subs:Array(6).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] }
+        ],
+        'VSP 32': [
+            { name:'FOUAD',      code:8, subs:Array(8).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'CHEOPS',     code:2, subs:Array(2).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'SALAM',      code:2, subs:Array(2).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'AURTHUR I',  code:4, subs:Array(4).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'AURTHUR II', code:4, subs:Array(4).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] },
+            { name:'AURTHUR III',code:4, subs:Array(4).fill(''), parts:[], note:'', rowsLimit:30, style:{}, cellStyles:{}, subStyles:{}, files:[] }
+        ]
+    },
     last: null
 };
+
+// merge: saved data wins ONLY if it has real content (not just default placeholder names)
+function isPlaceholder(regions) {
+    if (!regions || regions.length === 0) return true;
+    // if all regions are named 'Main Area' or 'New Area' with no real parts/subs data, treat as placeholder
+    return regions.every(r => 
+        (r.name === 'Main Area' || r.name === 'New Area') &&
+        (!r.parts || r.parts.length === 0) &&
+        (!r.subs || r.subs.every(s => s === ''))
+    );
+}
+function mergeWithDefaults(saved) {
+    const base = JSON.parse(JSON.stringify(DEFAULT_DB));
+    if (!saved) return base;
+    base.unitStyles = saved.unitStyles || {};
+    base.last = saved.last || null;
+    base.units.forEach(u => {
+        if (saved.storage && saved.storage[u] && !isPlaceholder(saved.storage[u])) {
+            base.storage[u] = saved.storage[u];
+        }
+        // else: keep the default data for this VSP
+    });
+    // keep extra VSPs the user added that aren't in defaults
+    if (saved.storage) {
+        Object.keys(saved.storage).forEach(u => {
+            if (!base.storage[u] && !isPlaceholder(saved.storage[u])) {
+                base.storage[u] = saved.storage[u];
+            }
+        });
+    }
+    return base;
+}
+
+let db = mergeWithDefaults(JSON.parse(localStorage.getItem('sca_v2')));
 let curU = '', curRIdx = -1, isEdit = false;
 let curVspCard = null;   // which VSP card is being styled
 let curRegIdx = null;    // which region is being styled
 let curCellKey = null;   // 'rowIndex:col'
 
+function resetToDefault() {
+    if (confirm('Reset all data to defaults? This will clear any saved changes.')) {
+        localStorage.removeItem('sca_v2');
+        localStorage.removeItem('sca_local_v1');
+        db = JSON.parse(JSON.stringify(DEFAULT_DB));
+        nav(1);
+    }
+}
 function save() { localStorage.setItem('sca_v2', JSON.stringify(db)); }
 
 // ═══════════════════════════════════════════════
