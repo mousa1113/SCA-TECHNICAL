@@ -1,1 +1,905 @@
-.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCA Technical Inspection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Tajawal:wght@400;700&family=Almarai:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --navy: #0d2546; --gold: #c5a059; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            background: #f0f2f5;
+            color: #222;
+        }
+
+        /* ── HEADER ── */
+        .official-header {
+            display: grid; grid-template-columns: 180px 1fr 180px;
+            border: 2px solid #000;
+            background: #fff;
+            width: 100%; max-width: 1020px; margin: 22px auto 0; min-height: 110px;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .h-logo { display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .h-logo img { max-width: 100%; max-height: 90px; }
+        .h-center { display: flex; flex-direction: column; text-align: center; justify-content: center; border-left: 2px solid #000; border-right: 2px solid #000; }
+        .h-line-1 { font-size: clamp(0.75rem, 2vw, 1.35rem); font-weight: bold; color: var(--navy); border-bottom: 2px solid #000; padding: 6px; }
+        .h-line-3 { font-size: clamp(0.8rem, 2.2vw, 1.5rem); font-weight: 900; background: #f5f5f5; flex-grow: 1; display: flex; align-items: center; justify-content: center; letter-spacing: 0.5px; }
+
+        /* ── LAYOUT ── */
+        .container { width: 100%; max-width: 1020px; margin: 0 auto; padding-bottom: 60px; padding-left: 12px; padding-right: 12px; }
+        .screen { display: none; background: #fff; padding: 30px; border: 1px solid #dde; border-radius: 12px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .active { display: block; }
+
+        /* ── TOOLBAR ── */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 2px solid #eee; }
+        .toolbar-left { display: flex; align-items: center; gap: 8px; }
+        .btn { padding: 9px 20px; border: none; font-weight: 700; cursor: pointer; border-radius: 7px; font-size: 0.88rem; transition: 0.2s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-edit { background: #f0f0f0; color: #333; border: 1.5px solid #ccc; }
+        .btn-edit.active-edit { background: #27ae60; color: #fff; border-color: #27ae60; }
+        .btn-nav { background: var(--navy); color: #fff; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn-success { background: #27ae60; color: #fff; }
+        .screen-title { font-size: 1.2rem; font-weight: 800; color: var(--navy); margin: 0; }
+
+        /* ── INLINE STYLE POPUP ── */
+        .style-popup {
+            display: none; position: absolute; z-index: 999;
+            background: #fff; border: 1.5px solid #ccc; border-radius: 8px;
+            padding: 8px 12px; gap: 8px; align-items: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            flex-wrap: wrap;
+        }
+        .style-popup.open { display: flex; }
+        .style-popup select, .style-popup input[type=number] {
+            padding: 4px 6px; border: 1px solid #ccc; border-radius: 5px; font-size: 0.82rem;
+        }
+        .style-popup input[type=color] { width: 32px; height: 28px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; padding: 1px; }
+        .style-popup label { font-size: 0.75rem; color: #777; }
+        .popup-close { background: none; border: none; cursor: pointer; font-size: 1rem; color: #999; margin-left: 4px; }
+
+        /* ── SCREEN 1 — VSP GRID ── */
+        .vsp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .vsp-card-wrap { position: relative; }
+        .vsp-card {
+            background: #fff;
+            padding: 28px 10px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.2s;
+            width: 100%;
+        }
+        .vsp-card:hover { border-color: var(--gold); box-shadow: 0 2px 10px rgba(197,160,89,0.2); }
+        .vsp-card.last-selected { border-color: var(--navy); background: var(--navy); color: var(--gold); }
+        .vsp-style-btn {
+            display: none; position: absolute; top: 4px; right: 4px;
+            background: rgba(255,255,255,0.9); border: 1px solid #ddd;
+            border-radius: 5px; padding: 2px 6px; font-size: 0.7rem; cursor: pointer;
+            color: #555;
+        }
+        .vsp-card-wrap:hover .vsp-style-btn { display: block; }
+
+        /* ── SCREEN 2 — REGIONS ── */
+        .region-card {
+            border: 2px solid #ddd;
+            margin-bottom: 14px;
+            border-radius: 10px;
+            overflow: visible;
+            background: #fff;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+        .region-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .region-main { display: flex; height: 66px; align-items: stretch; }
+        .region-del-btn { background: #e74c3c; color: #fff; border: none; width: 38px; cursor: pointer; font-size: 1rem; border-right: 2px solid #ddd; }
+        .region-name-btn {
+            flex-grow: 1; border: none; background: transparent;
+            font-size: 1.3rem; font-weight: 700; cursor: pointer;
+            text-align: center; height: 100%; color: var(--navy);
+            border-right: 2px solid #ddd; padding: 0 10px;
+            transition: background 0.15s;
+        }
+        .region-name-btn:hover { background: #f9f9f9; }
+        .region-name-input {
+            flex-grow: 1; border: none; background: #fffbe6;
+            font-size: 1.3rem; font-weight: 700; text-align: center;
+            height: 100%; color: var(--navy); border-right: 2px solid #ddd;
+            padding: 0 10px; outline: none;
+        }
+        .region-count-box {
+            width: 100px; background: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; position: relative;
+        }
+        .region-count-input {
+            width: 100%; height: 100%; border: none; background: transparent;
+            font-size: 2rem; font-weight: 900; text-align: center; outline: none;
+            cursor: pointer;
+        }
+        .region-count-input::-webkit-outer-spin-button,
+        .region-count-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .region-count-input { -moz-appearance: textfield; }
+        .region-style-btn {
+            width: 30px; background: rgba(255,255,255,0.25); border: none;
+            cursor: pointer; font-size: 0.75rem; color: #333; border-left: 1px solid rgba(0,0,0,0.1);
+        }
+        .region-style-btn:hover { background: rgba(255,255,255,0.5); }
+        .sub-fields { display: none; background: #f5f6f8; padding: 14px 12px; border-top: 2px solid #eee; overflow: hidden; }
+        .sub-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .sub-card {
+            background: #fff; border: 2px solid #e0e0e0; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 12px 8px 8px; cursor: pointer; transition: 0.2s; min-height: 80px; position: relative;
+            overflow: hidden;
+        }
+        .sub-card:hover { border-color: var(--gold); box-shadow: 0 2px 8px rgba(197,160,89,0.2); }
+        .sub-card-num {
+            width: 100%; border: none; background: transparent; outline: none;
+            font-size: 1.6rem; font-weight: 900; color: var(--navy);
+            text-align: center; cursor: pointer; padding: 0;
+            -moz-appearance: textfield;
+        }
+        .sub-card-num::-webkit-outer-spin-button,
+        .sub-card-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .sub-card-num:read-only { cursor: pointer; }
+        .sub-card-label { font-size: 0.62rem; color: #bbb; margin-top: 4px; letter-spacing: 0.5px; }
+        .sub-style-btn { display:none; position:absolute; top:2px; right:2px; background:rgba(197,160,89,0.2); border:none; border-radius:3px; font-size:0.6rem; cursor:pointer; padding:1px 4px; color:var(--navy); }
+        .sub-card:hover .sub-style-btn { display: block; }
+
+        /* ── SCREEN 3 — PARTS TABLE ── */
+        .parts-table { width: 100%; border-collapse: collapse; border: 2px solid #000; table-layout: fixed; }
+        .parts-table th, .parts-table td { border: 1.5px solid #bbb; padding: 3px; text-align: center; }
+        .parts-table th { background: #f0f0f0; font-weight: 700; font-size: 0.9rem; padding: 8px 4px; }
+        .parts-table td { padding: 2px; }
+        .parts-table .row-num { background: #f8f8f8; color: #999; font-size: 0.82rem; }
+        .cell-wrap { position: relative; display: flex; align-items: center; }
+        .cell-input {
+            width: 100%; height: 34px; border: none; text-align: center;
+            font-size: 0.95rem; outline: none; background: transparent; padding: 0 4px;
+        }
+        .cell-input:focus { background: #fffbe6; }
+        .cell-input:disabled { color: #333; cursor: default; }
+        .cell-style-btn {
+            display: none; position: absolute; right: 1px; top: 1px;
+            background: rgba(197,160,89,0.15); border: none; border-radius: 3px;
+            font-size: 0.6rem; cursor: pointer; padding: 1px 3px; color: var(--navy); z-index: 2;
+        }
+        .cell-wrap:hover .cell-style-btn { display: block; }
+
+        /* ── NOTES & FILES ── */
+        #noteVal { width:100%; height:90px; margin-top:14px; border:1.5px solid #ddd; padding:10px 14px; font-size:0.95rem; border-radius: 7px; resize: vertical; }
+        #noteVal:focus { border-color: var(--gold); outline: none; }
+        .files-section { margin-top: 14px; border: 1.5px solid #ddd; border-radius: 8px; overflow: hidden; }
+        .files-header { background: #333; color: #fff; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem; }
+        .files-list { display: none; padding: 10px; list-style: none; margin: 0; }
+        .file-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 6px; margin-bottom: 4px; background: #f9f9f9; border: 1px solid #eee; }
+        .file-item a { text-decoration: none; color: #007bff; font-weight: 600; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* ── ROWS CONTROL ── */
+        .rows-control { display: flex; align-items: center; gap: 6px; }
+        .rows-control label { font-size: 0.8rem; color: #888; }
+        .rows-control input { width: 52px; text-align: center; border: 1.5px solid var(--gold); border-radius: 5px; padding: 4px; font-weight: 700; }
+
+        /* ── PRINT ── */
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 700px) {
+            .official-header { grid-template-columns: 80px 1fr 80px; min-height: 80px; }
+            .h-logo img { max-height: 60px; }
+            .vsp-grid { grid-template-columns: repeat(2, 1fr); }
+            .sub-grid { grid-template-columns: repeat(2, 1fr); overflow-x: hidden; }
+            .toolbar { flex-wrap: wrap; gap: 8px; }
+            .toolbar-left { flex-wrap: wrap; }
+            .screen { padding: 14px 10px; }
+            .region-main { height: 54px; }
+            .region-name-btn, .region-name-input { font-size: 1rem; }
+            .region-count-box { width: 72px; }
+            .region-count-input { font-size: 1.5rem; }
+            .parts-table th, .parts-table td { font-size: 0.78rem; padding: 2px; }
+            .cell-input { font-size: 0.78rem; height: 28px; }
+            .btn { padding: 7px 12px; font-size: 0.8rem; }
+            .rows-control { display: none; }
+        }
+        @media (max-width: 420px) {
+            .official-header { grid-template-columns: 60px 1fr 60px; }
+            .vsp-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .sub-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .screen-title { font-size: 0.95rem; }
+        }
+        @media print {
+            body { background: #fff !important; }
+            .no-print { display: none !important; }
+            .screen { display: block !important; border: none; box-shadow: none; padding: 0; margin: 0; }
+            .container, .official-header { width: 100% !important; }
+            .official-header { box-shadow: none; }
+            .parts-table th, .parts-table td { border: 1px solid #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="official-header">
+    <div class="h-logo"><img src="image_5c761b.png" alt="Logo"></div>
+    <div class="h-center">
+        <div class="h-line-1" id="hLine1">SUEZ CANAL AUTHORITY</div>
+        <div class="h-line-3" id="hLine2">TECHNICAL INSPECTION REPORT</div>
+    </div>
+    <div class="h-logo"><img src="image_5c0103.png" alt="Logo"></div>
+</header>
+
+<div class="container">
+
+    <!-- ════ SCREEN 1 : SELECT UNIT ════ -->
+    <main id="scr1" class="screen active">
+        <div class="toolbar">
+            <h2 class="screen-title">Select Unit</h2>
+            <button class="btn btn-edit" id="btnEdit1" onclick="toggleEdit(1)">✎ Edit Cards</button>
+        </div>
+        <div class="vsp-grid" id="vspGrid"></div>
+        <!-- popup for VSP card style -->
+        <div class="style-popup" id="popupVsp">
+            <label>Font</label>
+            <select id="fontVsp" onchange="applyVspStyle()">
+                <option value="'Segoe UI'">Default</option>
+                <option value="'Cairo'">Cairo</option>
+                <option value="'Tajawal'">Tajawal</option>
+                <option value="'Almarai'">Almarai</option>
+                <option value="'Roboto'">Roboto</option>
+            </select>
+            <label>Size</label>
+            <input type="number" id="sizeVsp" value="20" style="width:52px" onchange="applyVspStyle()">
+            <label>Text</label>
+            <input type="color" id="colorVspText" value="#0d2546" onchange="applyVspStyle()">
+            <label>BG</label>
+            <input type="color" id="colorVspBg" value="#ffffff" onchange="applyVspStyle()">
+            <button class="popup-close" onclick="closePopup('popupVsp')">✕</button>
+        </div>
+    </main>
+
+    <!-- ════ SCREEN 2 : REGIONS ════ -->
+    <main id="scr2" class="screen">
+        <div class="toolbar no-print">
+            <div class="toolbar-left">
+                <button class="btn btn-edit" id="btnEdit2" onclick="toggleEdit(2)">✎ Edit Mode</button>
+            </div>
+            <h2 class="screen-title" id="vspLabel">Unit</h2>
+            <button class="btn btn-nav" onclick="nav(1)">← Back</button>
+        </div>
+        <div id="regionsContainer"></div>
+        <!-- per-region style popup — reused, positioned by JS -->
+        <div class="style-popup" id="popupReg">
+            <label>Font</label>
+            <select id="fontReg" onchange="applyRegStyle()">
+                <option value="'Segoe UI'">Default</option>
+                <option value="'Cairo'">Cairo</option>
+                <option value="'Tajawal'">Tajawal</option>
+                <option value="'Almarai'">Almarai</option>
+                <option value="'Roboto'">Roboto</option>
+            </select>
+            <label>Size</label>
+            <input type="number" id="sizeReg" value="22" style="width:52px" onchange="applyRegStyle()">
+            <label>Text</label>
+            <input type="color" id="colorReg" value="#0d2546" onchange="applyRegStyle()">
+            <label>BG</label>
+            <input type="color" id="bgReg" value="#c5a059" onchange="applyRegStyle()">
+            <button class="popup-close" onclick="closePopup('popupReg')">✕</button>
+        </div>
+    </main>
+
+    <!-- ════ SCREEN 3 : PARTS TABLE ════ -->
+    <main id="scr3" class="screen">
+        <div class="toolbar no-print">
+            <div class="toolbar-left">
+                <button class="btn btn-edit" id="btnEdit3" onclick="toggleEdit(3)">✎ Edit Report</button>
+                <div id="fileWrapper" style="display:none; margin-left:8px;">
+                    <label for="fileIn" style="cursor:pointer; background:var(--gold); color:#fff; padding:7px 12px; border-radius:6px; font-size:0.83rem; font-weight:700;">📎 Attach</label>
+                    <input type="file" id="fileIn" hidden multiple onchange="handleFileUpload(this)">
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <h2 id="partLabel" style="margin:0; color:var(--navy);">Area</h2>
+                <div class="rows-control">
+                    <label>Rows</label>
+                    <input type="number" id="rowsLimit" value="30" onchange="updateRowsLimit(this.value)">
+                </div>
+            </div>
+            <button class="btn btn-nav" onclick="nav(2)">← Back</button>
+        </div>
+
+        <table class="parts-table">
+            <thead>
+                <tr>
+                    <th style="width:46px;">No.</th>
+                    <th>Part Name</th>
+                    <th style="width:80px;">Qty.</th>
+                    <th style="width:155px;">Part No.</th>
+                </tr>
+            </thead>
+            <tbody id="partsTableBody"></tbody>
+        </table>
+
+        <div class="files-section">
+            <div class="files-header" onclick="toggleFiles()">
+                <span>📁 Attached Files (<span id="fileCount">0</span>)</span>
+                <span>▼</span>
+            </div>
+            <ul class="files-list" id="attachedFileList"></ul>
+        </div>
+
+        <textarea id="noteVal" placeholder="Notes..."></textarea>
+        <button class="btn no-print" style="width:100%; margin-top:18px; background:#111; color:#fff; font-size:1rem;" onclick="window.print()">🖨 PRINT TO PDF</button>
+
+        <!-- per-cell style popup -->
+        <div class="style-popup" id="popupCell">
+            <label>Font</label>
+            <select id="fontCell" onchange="applyCellStyle()">
+                <option value="'Segoe UI'">Default</option>
+                <option value="'Cairo'">Cairo</option>
+                <option value="'Tajawal'">Tajawal</option>
+                <option value="'Almarai'">Almarai</option>
+                <option value="'Roboto'">Roboto</option>
+            </select>
+            <label>Size</label>
+            <input type="number" id="sizeCell" value="15" style="width:52px" onchange="applyCellStyle()">
+            <label>Color</label>
+            <input type="color" id="colorCell" value="#000000" onchange="applyCellStyle()">
+            <label>BG</label>
+            <input type="color" id="bgCell" value="#ffffff" onchange="applyCellStyle()">
+            <button class="popup-close" onclick="closePopup('popupCell')">✕</button>
+        </div>
+    </main>
+
+    <!-- per-sub style popup -->
+    <div class="style-popup" id="popupSub">
+        <label>Font</label>
+        <select id="fontSub" onchange="applySubStyle()">
+            <option value="'Segoe UI'">Default</option>
+            <option value="'Cairo'">Cairo</option>
+            <option value="'Tajawal'">Tajawal</option>
+            <option value="'Almarai'">Almarai</option>
+            <option value="'Roboto'">Roboto</option>
+        </select>
+        <label>Size</label>
+        <input type="number" id="sizeSub" value="15" style="width:52px" onchange="applySubStyle()">
+        <label>Text</label>
+        <input type="color" id="colorSub" value="#000000" onchange="applySubStyle()">
+        <label>BG</label>
+        <input type="color" id="bgSub" value="#ffffff" onchange="applySubStyle()">
+        <button class="popup-close" onclick="closePopup('popupSub')">✕</button>
+    </div>
+</div><!-- /container -->
+
+<script>
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║                         ⚙️  CONFIG ZONE                                 ║
+// ║   هنا بتكتب كل بيانات الموقع — كل جزء عنده تعليق يوضح مكانه           ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+// ┌─────────────────────────────────────────────────────────────────────────┐
+// │  1️⃣  اسم الهيدر — السطر الأول والثاني اللي بيظهروا في أعلى الصفحة     │
+// │     عدّل النصوص بين علامات التنصيص "" بس                               │
+// └─────────────────────────────────────────────────────────────────────────┘
+const CONFIG_HEADER = {
+    line1 : "SUEZ CANAL AUTHORITY",        // ← السطر الأول  (الاسم الرئيسي)
+    line2 : "TECHNICAL INSPECTION REPORT"  // ← السطر الثاني (عنوان التقرير)
+};
+
+// ┌─────────────────────────────────────────────────────────────────────────┐
+// │  2️⃣  أسماء الـ VSP — الكروت اللي بتظهر في الصفحة الأولى               │
+// │     زود أو شيل اسم VSP من القايمة دي                                   │
+// └─────────────────────────────────────────────────────────────────────────┘
+const CONFIG_UNITS = [
+    'VSP 10',  // ← VSP 1
+    'VSP 12',  // ← VSP 2
+    'VSP 14',  // ← VSP 3
+    'VSP 16',  // ← VSP 4
+    'VSP 24',  // ← VSP 5
+    'VSP 28',  // ← VSP 6
+    'VSP 32',  // ← VSP 7
+];
+
+// ┌─────────────────────────────────────────────────────────────────────────┐
+// │  3️⃣  بيانات كل VSP — المناطق (Regions) وعدد الـ Subs لكل منطقة        │
+// │                                                                         │
+// │  الفورمات:                                                              │
+// │  { name:'اسم المنطقة', code: عدد_الـSubs }                             │
+// │                                                                         │
+// │  ملاحظة: لو عايز تزود VSP جديد، اتبع نفس الشكل وأضفه في              │
+// │  CONFIG_UNITS فوق كمان                                                  │
+// └─────────────────────────────────────────────────────────────────────────┘
+const CONFIG_REGIONS = {
+
+    // ══ VSP 10 ══════════════════════════════════════
+    // الـ subs: ممكن تحط أرقام جوا [] زي المثال ده أو تسيبها فاضية
+    // مثال: subs: [101, 102, 103, 104]  ← هيظهروا جوا الكروت الصغيرة
+    // لو مش محتاج أرقام ثابتة، شيل الـ subs سطر بالكامل
+    'VSP 10': [
+        { name: 'ISMAILIA', code: 4,  subs: ['', '', '', '']           },  // ← منطقة 1 — اكتب الأرقام بدل ''
+        { name: 'GIZA',     code: 6,  subs: ['', '', '', '', '', '']   },  // ← منطقة 2
+        { name: 'ASHRA',    code: 12, subs: Array(12).fill('')          },  // ← منطقة 3
+        { name: 'FAYID',    code: 16, subs: Array(16).fill('')          },  // ← منطقة 4
+    ],
+
+    // ══ VSP 12 ══════════════════════════════════════
+    'VSP 12': [
+        // ← ضيف مناطق VSP 12 هنا بنفس الشكل
+        // مثال: { name: 'AREA NAME', code: 5 },
+    ],
+
+    // ══ VSP 14 ══════════════════════════════════════
+    'VSP 14': [
+        { name: 'ELCAP',  code: 62 },  // ← منطقة 1
+        { name: 'ELTINA', code: 10 },  // ← منطقة 2
+        { name: 'ELFOUA', code: 4  },  // ← منطقة 3
+    ],
+
+    // ══ VSP 16 ══════════════════════════════════════
+    'VSP 16': [
+        { name: 'ELMORA',    code: 4 },  // ← منطقة 1
+        { name: 'EMLAK',     code: 3 },  // ← منطقة 2
+        { name: 'PORTFOUAD', code: 2 },  // ← منطقة 3
+    ],
+
+    // ══ VSP 24 ══════════════════════════════════════
+    'VSP 24': [
+        { name: 'BITTERSEA', code: 2 },  // ← منطقة 1
+    ],
+
+    // ══ VSP 28 ══════════════════════════════════════
+    'VSP 28': [
+        { name: 'BITTERSEA', code: 2 },  // ← منطقة 1
+        { name: 'PORTSAID',  code: 6 },  // ← منطقة 2
+    ],
+
+    // ══ VSP 32 ══════════════════════════════════════
+    'VSP 32': [
+        { name: 'FOUAD',       code: 8 },  // ← منطقة 1
+        { name: 'CHEOPS',      code: 2 },  // ← منطقة 2
+        { name: 'SALAM',       code: 2 },  // ← منطقة 3
+        { name: 'AURTHUR I',   code: 4 },  // ← منطقة 4
+        { name: 'AURTHUR II',  code: 4 },  // ← منطقة 5
+        { name: 'AURTHUR III', code: 4 },  // ← منطقة 6
+    ],
+
+};
+// ╚══════════════════════════════════════════════════════════════════════════╝
+//                        نهاية الـ CONFIG ZONE
+// ╔══════════════════════════════════════════════════════════════════════════╝
+
+// ── build DEFAULT_DB from config ────────────────────────────────────────────
+function buildRegion(r) {
+    // subs: use provided array or fill with empty strings up to code count
+    const subsArr = r.subs ? r.subs.concat(Array(Math.max(0, r.code - r.subs.length)).fill(''))
+                           : Array(r.code).fill('');
+    return { name: r.name, code: r.code, subs: subsArr, parts: [], note: '', rowsLimit: 30, style: {}, cellStyles: {}, subStyles: {}, files: [] };
+}
+const DEFAULT_DB = {
+    units: CONFIG_UNITS,
+    unitStyles: {},
+    storage: Object.fromEntries(
+        Object.entries(CONFIG_REGIONS).map(([vsp, regions]) => [vsp, regions.map(buildRegion)])
+    ),
+    last: null
+};
+
+// merge: saved data wins ONLY if it has real content (not just default placeholder names)
+function isPlaceholder(regions) {
+    if (!regions || regions.length === 0) return true;
+    // if all regions are named 'Main Area' or 'New Area' with no real parts/subs data, treat as placeholder
+    return regions.every(r => 
+        (r.name === 'Main Area' || r.name === 'New Area') &&
+        (!r.parts || r.parts.length === 0) &&
+        (!r.subs || r.subs.every(s => s === ''))
+    );
+}
+function mergeWithDefaults(saved) {
+    const base = JSON.parse(JSON.stringify(DEFAULT_DB));
+    if (!saved) return base;
+    base.unitStyles = saved.unitStyles || {};
+    base.last = saved.last || null;
+    base.units.forEach(u => {
+        if (saved.storage && saved.storage[u] && !isPlaceholder(saved.storage[u])) {
+            base.storage[u] = saved.storage[u];
+        }
+        // else: keep the default data for this VSP
+    });
+    // keep extra VSPs the user added that aren't in defaults
+    if (saved.storage) {
+        Object.keys(saved.storage).forEach(u => {
+            if (!base.storage[u] && !isPlaceholder(saved.storage[u])) {
+                base.storage[u] = saved.storage[u];
+            }
+        });
+    }
+    return base;
+}
+
+let db = mergeWithDefaults(JSON.parse(localStorage.getItem('sca_v2')));
+let curU = '', curRIdx = -1, curSubIdx = -1, isEdit = false;
+let curVspCard = null;   // which VSP card is being styled
+let curRegIdx = null;    // which region is being styled
+let curCellKey = null;   // 'rowIndex:col'
+
+function resetToDefault() {
+    if (confirm('Reset all data to defaults? This will clear any saved changes.')) {
+        localStorage.removeItem('sca_v2');
+        localStorage.removeItem('sca_local_v1');
+        db = JSON.parse(JSON.stringify(DEFAULT_DB));
+        nav(1);
+    }
+}
+function save() { localStorage.setItem('sca_v2', JSON.stringify(db)); }
+
+// ═══════════════════════════════════════════════
+//  APPLY CONFIG TO HEADER
+// ═══════════════════════════════════════════════
+document.getElementById('hLine1').innerText = CONFIG_HEADER.line1;
+document.getElementById('hLine2').innerText = CONFIG_HEADER.line2;
+
+// ═══════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════
+function nav(s, v) {
+    closeAllPopups();
+    document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+    document.getElementById('scr' + s).classList.add('active');
+    isEdit = false;
+    if (s === 1) { renderVsp(); updateUI(1); }
+    if (s === 2 && v) { curU = v; db.last = v; save(); }
+    if (s === 2) { document.getElementById('vspLabel').innerText = curU; renderReg(); updateUI(2); }
+    if (s === 3) { if (typeof v === 'number') curRIdx = v; renderParts(); updateUI(3); }
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 1 — VSP
+// ═══════════════════════════════════════════════
+function renderVsp() {
+    document.getElementById('vspGrid').innerHTML = db.units.map((u, idx) => {
+        const st = db.unitStyles[u] || {};
+        const bgColor = st.bg || '#ffffff';
+        const textColor = st.color || '#0d2546';
+        const font = st.font || "'Segoe UI'";
+        const size = st.size || 20;
+        const isLast = u === db.last;
+        return `
+        <div class="vsp-card-wrap">
+            <button class="vsp-card ${isLast ? 'last-selected' : ''}"
+                onclick="nav(2,'${u}')"
+                style="font-family:${font}; font-size:${size}px; color:${isLast?'var(--gold)':textColor}; background:${isLast?'var(--navy)':bgColor};">
+                ${u}
+            </button>
+            ${isEdit ? `<button class="vsp-style-btn" onclick="openVspPopup(event,'${u}',${idx})">⚙ Style</button>` : ''}
+        </div>`;
+    }).join('');
+}
+
+function openVspPopup(e, unitName, idx) {
+    e.stopPropagation();
+    curVspCard = unitName;
+    const st = db.unitStyles[unitName] || {};
+    document.getElementById('fontVsp').value = st.font || "'Segoe UI'";
+    document.getElementById('sizeVsp').value = st.size || 20;
+    document.getElementById('colorVspText').value = st.color || '#0d2546';
+    document.getElementById('colorVspBg').value = st.bg || '#ffffff';
+    positionPopup('popupVsp', e.target);
+}
+function applyVspStyle() {
+    if (!curVspCard) return;
+    db.unitStyles[curVspCard] = {
+        font: document.getElementById('fontVsp').value,
+        size: parseInt(document.getElementById('sizeVsp').value),
+        color: document.getElementById('colorVspText').value,
+        bg: document.getElementById('colorVspBg').value
+    };
+    save(); renderVsp();
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 2 — REGIONS
+// ═══════════════════════════════════════════════
+function ensureStorage() {
+    if (!db.storage[curU]) db.storage[curU] = [
+        { name: 'Main Area', code: 1, subs: [''], parts: [], note: '', rowsLimit: 30, style: {}, cellStyles: {}, files: [] }
+    ];
+}
+
+function renderReg() {
+    ensureStorage();
+    const c = document.getElementById('regionsContainer');
+    c.innerHTML = db.storage[curU].map((r, i) => {
+        const st = r.style || {};
+        const nameColor = st.color || 'var(--navy)';
+        const nameFont = st.font || 'inherit';
+        const nameSize = st.size || '1.3rem';
+        const goldBg = st.bg || '#c5a059';
+        return `
+        <div class="region-card" id="rc-${i}">
+            <div class="region-main">
+                ${isEdit ? `<button class="region-del-btn" onclick="remR(${i})">✕</button>` : ''}
+                ${isEdit
+                    ? `<input class="region-name-input" value="${r.name}" style="font-family:${nameFont}; font-size:${nameSize}; color:${nameColor};" onchange="upN(${i},this.value)">`
+                    : `<button class="region-name-btn" onclick="goRep(${i})" style="font-family:${nameFont}; font-size:${nameSize}; color:${nameColor};">${r.name}</button>`
+                }
+                <div class="region-count-box" style="background:${goldBg};" onclick="handleGoldClick(${i})">
+                    <input type="number" class="region-count-input" value="${r.code}"
+                        ${isEdit ? '' : 'readonly'}
+                        onchange="autoSubs(${i}, this.value)"
+                        onclick="event.stopPropagation(); handleGoldClick(${i});">
+                    ${isEdit ? `<button class="region-style-btn" onclick="openRegPopup(event,${i})" title="Style">⚙</button>` : ''}
+                </div>
+            </div>
+            <div id="sub-box-${i}" class="sub-fields">
+                <div class="sub-grid">
+                ${(r.subs || []).map((s, si) => {
+                    const ssk = i+':'+si;
+                    const ss = (r.subStyles && r.subStyles[ssk]) || {};
+                    const sc = ss.color || 'var(--navy)'; const sbg = ss.bg || '#fff';
+                    return `<div class="sub-card" style="background:${sbg};" onclick="goSubRep(${i},${si})">
+                        <input class="sub-card-num" type="number" value="${s||''}" placeholder="${si+1}"
+                            ${isEdit ? '' : 'readonly'}
+                            onclick="event.stopPropagation();"
+                            onchange="upSub(${i},${si},this.value)"
+                            style="color:${sc};">
+                        <span class="sub-card-label">SUB ${si+1}</span>
+                        ${isEdit ? '<button class=\"sub-card-style\" onclick=\"openSubPopup(event,'+i+','+si+')\">⚙</button>' : ''}
+                    </div>`;}).join('')}
+                </div>
+            </div>
+        </div>`;
+    }).join('') + (isEdit
+        ? `<button class="btn btn-success" style="width:100%; margin-top:12px;" onclick="addR()">＋ Add New Area</button>`
+        : '');
+}
+
+function openRegPopup(e, idx) {
+    e.stopPropagation();
+    curRegIdx = idx;
+    const st = db.storage[curU][idx].style || {};
+    document.getElementById('fontReg').value = st.font || "'Segoe UI'";
+    document.getElementById('sizeReg').value = parseInt(st.size) || 22;
+    document.getElementById('colorReg').value = st.color || '#0d2546';
+    document.getElementById('bgReg').value = st.bg || '#c5a059';
+    positionPopup('popupReg', e.target);
+}
+function applyRegStyle() {
+    if (curRegIdx === null) return;
+    db.storage[curU][curRegIdx].style = {
+        font: document.getElementById('fontReg').value,
+        size: document.getElementById('sizeReg').value + 'px',
+        color: document.getElementById('colorReg').value,
+        bg: document.getElementById('bgReg').value
+    };
+    save(); renderReg();
+}
+
+function handleGoldClick(idx) {
+    const el = document.getElementById('sub-box-' + idx);
+    el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+function autoSubs(idx, val) {
+    let num = Math.max(0, parseInt(val) || 0);
+    let r = db.storage[curU][idx];
+    const openBoxes = [];
+    db.storage[curU].forEach((_, i) => { const el = document.getElementById('sub-box-' + i); if (el && el.style.display === 'block') openBoxes.push(i); });
+    while (r.subs.length < num) r.subs.push('');
+    r.subs = r.subs.slice(0, num); r.code = num;
+    save(); renderReg();
+    setTimeout(() => {
+        openBoxes.forEach(i => { const el = document.getElementById('sub-box-' + i); if (el) el.style.display = 'block'; });
+        const cur = document.getElementById('sub-box-' + idx); if (cur) cur.style.display = 'block';
+    }, 10);
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 3 — PARTS TABLE  (per-cell styling)
+// ═══════════════════════════════════════════════
+function renderParts() {
+    const r = db.storage[curU][curRIdx];
+    const partsKey = curSubIdx !== null ? 'subParts_' + curSubIdx : 'parts';
+    const cellKey  = curSubIdx !== null ? 'subCells_' + curSubIdx : 'cellStyles';
+    if (!r[partsKey]) r[partsKey] = [];
+    if (!r[cellKey])  r[cellKey]  = {};
+    const limit = r.rowsLimit || 30;
+    const cellStyles = r[cellKey] || {};
+    const b = document.getElementById('partsTableBody');
+    b.innerHTML = '';
+    for (let i = 0; i < limit; i++) {
+        const parts = getParts(); const p = parts[i] ? parts[i] : { n: '', q: '', pn: '' };
+        const cols = ['n', 'q', 'pn'];
+        const tds = cols.map(col => {
+            const key = i + ':' + col;
+            const cs = cellStyles[key] || {};
+            const font = cs.font || "'Segoe UI'";
+            const size = cs.size || 15;
+            const color = cs.color || '#000';
+            const bg = cs.bg || 'transparent';
+            const align = col === 'n' ? 'left; padding-left:10px' : 'center';
+            return `<td>
+                <div class="cell-wrap">
+                    <input class="cell-input" type="text" value="${p[col] || ''}"
+                        ${isEdit ? '' : 'disabled'}
+                        onchange="upP(${i},'${col}',this.value)"
+                        style="font-family:${font}; font-size:${size}px; color:${color}; background:${bg}; text-align:${align};">
+                    <button class="cell-style-btn" onclick="openCellPopup(event,${i},'${col}')">⚙</button>
+                </div>
+            </td>`;
+        }).join('');
+        b.innerHTML += `<tr><td class="row-num">${i + 1}</td>${tds}</tr>`;
+    }
+    const subTitle = curSubIdx >= 0 ? ' › ' + (r.subs[curSubIdx] || 'Sub '+(curSubIdx+1)) : '';
+    document.getElementById('partLabel').innerText = r.name + subTitle;
+    document.getElementById('rowsLimit').value = limit;
+    const nv = document.getElementById('noteVal');
+    nv.value = r.note || '';
+    nv.disabled = !isEdit;
+    renderFilesList();
+}
+
+function openCellPopup(e, row, col) {
+    e.stopPropagation();
+    curCellKey = row + ':' + col;
+    const cs = (db.storage[curU][curRIdx].cellStyles || {})[curCellKey] || {};
+    document.getElementById('fontCell').value = cs.font || "'Segoe UI'";
+    document.getElementById('sizeCell').value = cs.size || 15;
+    document.getElementById('colorCell').value = cs.color || '#000000';
+    document.getElementById('bgCell').value = cs.bg || '#ffffff';
+    positionPopup('popupCell', e.target);
+}
+function applyCellStyle() {
+    if (!curCellKey) return;
+    const r = db.storage[curU][curRIdx];
+    const ck = curSubIdx !== null ? 'subCells_' + curSubIdx : 'cellStyles';
+    if (!r[ck]) r[ck] = {};
+    r[ck][curCellKey] = {
+        font: document.getElementById('fontCell').value,
+        size: parseInt(document.getElementById('sizeCell').value),
+        color: document.getElementById('colorCell').value,
+        bg: document.getElementById('bgCell').value
+    };
+    save(); renderParts();
+}
+
+// ═══════════════════════════════════════════════
+//  FILES
+// ═══════════════════════════════════════════════
+function handleFileUpload(input) {
+    const r = db.storage[curU][curRIdx];
+    if (!r.files) r.files = [];
+    Array.from(input.files).forEach(f => {
+        const reader = new FileReader();
+        reader.onload = (e) => { r.files.push({ name: f.name, data: e.target.result }); save(); renderFilesList(); };
+        reader.readAsDataURL(f);
+    });
+}
+function renderFilesList() {
+    const r = db.storage[curU][curRIdx];
+    const list = document.getElementById('attachedFileList');
+    const count = document.getElementById('fileCount');
+    if (!r.files || r.files.length === 0) { list.innerHTML = '<li style="color:#999; text-align:center; padding:8px;">No files attached.</li>'; count.innerText = '0'; return; }
+    count.innerText = r.files.length;
+    list.innerHTML = r.files.map((f, i) => `
+        <li class="file-item">
+            <span>📄</span>
+            <a href="${f.data}" download="${f.name}">${f.name}</a>
+            ${isEdit ? `<button onclick="remFile(${i})" style="color:#e74c3c;border:none;background:none;cursor:pointer;font-weight:700;">✕</button>` : ''}
+        </li>`).join('');
+}
+function remFile(i) { db.storage[curU][curRIdx].files.splice(i, 1); save(); renderFilesList(); }
+function toggleFiles() { const l = document.getElementById('attachedFileList'); l.style.display = (l.style.display === 'block') ? 'none' : 'block'; }
+
+// ═══════════════════════════════════════════════
+//  EDIT TOGGLE & UI
+// ═══════════════════════════════════════════════
+function toggleEdit(s) {
+    isEdit = !isEdit;
+    if (!isEdit) save();
+    updateUI(s);
+}
+function updateUI(s) {
+    [1, 2, 3].forEach(n => {
+        const b = document.getElementById('btnEdit' + n);
+        if (b) { b.innerText = (s === n && isEdit) ? '✔ Save' : (n === 3 ? '✎ Edit Report' : n === 1 ? '✎ Edit Cards' : '✎ Edit Mode'); }
+        if (b && s === n && isEdit) b.classList.add('active-edit'); else if (b) b.classList.remove('active-edit');
+    });
+    if (s === 1) renderVsp();
+    if (s === 2) renderReg();
+    if (s === 3) {
+        document.getElementById('fileWrapper').style.display = isEdit ? 'block' : 'none';
+        renderParts();
+    }
+}
+
+// ═══════════════════════════════════════════════
+//  POPUP HELPERS
+// ═══════════════════════════════════════════════
+function positionPopup(id, anchor) {
+    closeAllPopups();
+    const pop = document.getElementById(id);
+    const rect = anchor.getBoundingClientRect();
+    pop.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+    pop.style.left = (rect.left + window.scrollX) + 'px';
+    pop.classList.add('open');
+}
+function closePopup(id) { document.getElementById(id).classList.remove('open'); }
+let curSubKey = null;
+function openSubPopup(e, regIdx, subIdx) {
+    e.stopPropagation();
+    curSubKey = regIdx + ':' + subIdx;
+    const r = db.storage[curU][regIdx];
+    const ss = (r.subStyles && r.subStyles[curSubKey]) || {};
+    document.getElementById('fontSub').value = ss.font || "'Segoe UI'";
+    document.getElementById('sizeSub').value = parseInt(ss.size) || 15;
+    document.getElementById('colorSub').value = ss.color || '#000000';
+    document.getElementById('bgSub').value = ss.bg || '#ffffff';
+    positionPopup('popupSub', e.target);
+}
+function applySubStyle() {
+    if (!curSubKey) return;
+    const parts = curSubKey.split(':');
+    const ri = parseInt(parts[0]); const si = parseInt(parts[1]);
+    if (!db.storage[curU][ri].subStyles) db.storage[curU][ri].subStyles = {};
+    db.storage[curU][ri].subStyles[curSubKey] = {
+        font: document.getElementById('fontSub').value,
+        size: document.getElementById('sizeSub').value + 'px',
+        color: document.getElementById('colorSub').value,
+        bg: document.getElementById('bgSub').value
+    };
+    save(); renderReg();
+    // reopen sub-boxes
+    setTimeout(() => { const el = document.getElementById('sub-box-' + ri); if (el) el.style.display = 'block'; }, 10);
+}
+function closeAllPopups() {
+    ['popupVsp', 'popupReg', 'popupCell', 'popupSub'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('open'); });
+}
+document.addEventListener('click', e => {
+    if (!e.target.closest('.style-popup') && !e.target.closest('.vsp-style-btn') && !e.target.closest('.region-style-btn') && !e.target.closest('.cell-style-btn')) closeAllPopups();
+});
+
+// ═══════════════════════════════════════════════
+//  DATA HELPERS
+// ═══════════════════════════════════════════════
+function goRep(i) { if (!isEdit) { curRIdx = i; curSubIdx = -1; nav(3); } }
+function goSubRep(regIdx, subIdx) { if (!isEdit) { curRIdx = regIdx; curSubIdx = subIdx; nav(3); } }
+function upN(i, v) { db.storage[curU][i].name = v; save(); }
+function upSub(i, si, v) { db.storage[curU][i].subs[si] = v; save(); }
+function getParts() {
+    const r = db.storage[curU][curRIdx];
+    if (curSubIdx >= 0) {
+        if (!r.subParts) r.subParts = {};
+        if (!r.subParts[curSubIdx]) r.subParts[curSubIdx] = [];
+        return r.subParts[curSubIdx];
+    }
+    return r.parts;
+}
+function upP(i, k, v) {
+    const parts = getParts();
+    if (!parts[i]) parts[i] = { n: '', q: '', pn: '' };
+    parts[i][k] = v; save();
+}
+function addR() {
+    db.storage[curU].push({ name: 'New Area', code: 1, subs: [''], parts: [], note: '', rowsLimit: 30, style: {}, cellStyles: {}, files: [] });
+    renderReg();
+}
+function remR(i) { if (confirm('Delete this area?')) { db.storage[curU].splice(i, 1); save(); renderReg(); } }
+function updateRowsLimit(v) { db.storage[curU][curRIdx].rowsLimit = parseInt(v) || 30; save(); renderParts(); }
+
+document.getElementById('noteVal').oninput = e => { if (db.storage[curU] && db.storage[curU][curRIdx]) { db.storage[curU][curRIdx].note = e.target.value; save(); } };
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+nav(1);
+</script>
+</body>
+</html>
